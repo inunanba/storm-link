@@ -1,5 +1,7 @@
 # Storm Link
 
+Demo video: https://youtu.be/N950ADnIfTc
+
 
 **They fix one failed message; we find the one cause behind the whole storm.**
 
@@ -31,10 +33,13 @@ docker compose up -d --build     # IRIS + worker, healthy in about 15 s once the
 Prerequisites: Docker with Compose, and the InterSystems IRIS 2026.3 AI Hub Community image (build 154) loaded locally. No licence key, API key or model download is needed.
 
 ```sh
-docker tag <build-154-community-image> iris-ai-hub:local154   # one-time
+docker image load -i iris-community-2026.3.0AI.154.0-docker.tar.gz   # one-time
+docker tag docker.iscinternal.com/docker-intersystems/intersystems/iris-community:2026.3.0AI.154.0 iris-ai-hub:local154   # one-time
 docker compose up -d --build
 docker compose ps        # iris and worker show (healthy)
 ```
+
+IPM: the package is `storm-link` (module.xml at the repo root). In an IRIS 2026.3 AI Hub instance with IPM, load it from a clone with `zpm "load /path/to/storm-link"`.
 
 | Destination | Address |
 |---|---|

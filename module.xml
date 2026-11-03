@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="storm-link.ZPM">
+    <Module>
+      <Name>storm-link</Name>
+      <Version>1.0.0</Version>
+      <Description>Folds an alert storm in an IRIS Production into one root cause on a Managed Alert, using the topology graph plus a %AI.Agent yes/no check.</Description>
+      <Keywords>AI Hub,Interoperability,Alerting,Agent</Keywords>
+      <Packaging>module</Packaging>
+      <SystemRequirements Version=">=2026.3" Interoperability="enabled"/>
+      <SourcesRoot>src</SourcesRoot>
+      <Resource Name="Storm.PKG"/>
+      <FileCopy Name="worker.py" Target="${mgrdir}storm-link/worker.py"/>
+      <FileCopy Name="fixtures/" Target="${mgrdir}storm-link/fixtures/"/>
+    </Module>
+  </Document>
+</Export>
