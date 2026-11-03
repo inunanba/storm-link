@@ -1,0 +1,1 @@
+{"id":"C08","alerts":[{"id":"a0","c":"DB.Out.EHR","t":0,"text":"ERROR #6022: Gateway failed: SQLServer.EHR connection refused"},{"id":"a1","c":"FHIR.In.API","t":3,"text":"Cannot bind port 52773: permission denied"},{"id":"a2","c":"DB.Out.EHR","t":30,"text":"ERROR #6022: Gateway failed: SQLServer.EHR connection refused"}]}

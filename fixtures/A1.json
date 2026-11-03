@@ -1,0 +1,1 @@
+{"id":"A1","alerts":[{"id":"a0","c":"DB.Out.EHR","t":0,"text":"ERROR #6022: Gateway failed: SQLServer.EHR connection refused"},{"id":"a1","c":"Router.ADT","t":40,"text":"Queue size 512 exceeds threshold"},{"id":"a2","c":"HL7.In.ADT","t":70,"text":"ACK to sender delayed 45s: downstream queue full"}]}

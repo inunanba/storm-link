@@ -1,0 +1,1 @@
+{"id":"A5","alerts":[{"id":"a0","c":"HL7.In.ADT","t":0,"text":"Journal write failed: disk full on /iris/journal"},{"id":"a1","c":"Router.ADT","t":5,"text":"Cannot save message: <FILEFULL>"},{"id":"a2","c":"DB.Out.EHR","t":12,"text":"Slow responses; possible root cause: SQLServer.EHR overloaded"}]}

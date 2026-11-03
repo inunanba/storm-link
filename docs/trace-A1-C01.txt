@@ -1,0 +1,30 @@
+# Native trace export from the compose smoke run (2026-11-03 JST), sessions 3 (C01) and 5 (A1)
+# H=Ens.MessageHeader id|session|source|target|body class|body id|time(UTC)|type  M=request body  R=Storm.Reply status|model|usage|tool calls|duration ms|payload  A=Ens.Alerting.ManagedAlert  ACT=action reason
+H|3|3|Storm.Service|Storm.Process|Storm.Message|1|2026-11-02 16:39:17.432|1
+M|3|{"id":"C01","alerts":[{"id":"a0","c":"Router.ADT","t":0,"text":"Queue size 512 exceeds threshold"},{"id":"a1","c":"Router.ADT","t":30,"text":"Queue size 512 exc
+H|4|3|Storm.Process|Storm.Service|Storm.Reply|2|2026-11-02 16:39:17.439|2
+R|4|FINAL|||||{"token":"4ae4ee58677ae00704e4cbaa73bddd96","status":"FINAL","mode":"replay","groups":[{"root":"a0","members":["a0","a1","a2"]}],"answers":{},"topology_hash":"0
+H|5|5|Storm.Service|Storm.Process|Storm.Message|3|2026-11-02 16:39:17.441|1
+M|5|{"id":"A1","alerts":[{"id":"a0","c":"DB.Out.EHR","t":0,"text":"ERROR #6022: Gateway failed: SQLServer.EHR connection refused"},{"id":"a1","c":"Router.ADT","t":4
+H|6|5|Storm.Process|Storm.Agent|Storm.Message|4|2026-11-02 16:39:17.443|1
+M|6|STORM_TICKET=2f1c04c41407f3e8df3f14ad49e9872d:2d20c3f66d4fb82dafa72f7719e96c6c33c2360f13a853761fabed9ecd3506bd MODE=replay Upstream alert on HL7.In.ADT at secon
+H|7|5|Storm.Agent|Storm.Process|Storm.Reply|5|2026-11-02 16:39:17.462|2
+R|7|ANSWER|llama3.2-3b-ctx16k:latest (recorded)||0|1|{"answer":"yes","reason":"The downstream failure of DB.Out.EHR caused messages to pile up in Router.ADT, resulting in a delayed ACK to HL7.In.ADT, which trigger
+H|8|5|Storm.Process|Storm.Agent|Storm.Message|6|2026-11-02 16:39:17.464|1
+M|8|STORM_TICKET=2f1c04c41407f3e8df3f14ad49e9872d:34c116108638048789d441a8f1f6c2d2538f935733032f4116b5d4505c74377d MODE=replay Root alert on DB.Out.EHR at second 0 
+H|9|5|Storm.Agent|Storm.Process|Storm.Reply|7|2026-11-02 16:39:17.469|2
+R|9|ANSWER|llama3.2-3b-ctx16k:latest (recorded)||0|0|{"answer":"yes","reason":"Both alerts report the same error code (#6022) and the same component (SQLServer.EHR) is failing, indicating a shared cause."}
+H|10|5|Storm.Process|Storm.Service|Storm.Reply|8|2026-11-02 16:39:17.472|2
+R|10|FINAL|||||{"token":"2f1c04c41407f3e8df3f14ad49e9872d","status":"FINAL","mode":"replay","groups":[{"root":"a0","members":["a0","a1","a2"]}],"answers":{"2d20c3f66d4fb82dafa
+A|1|Router.ADT|Queue size 512 exceeds threshold|actions=2
+  ACT|Storm C01; root alert=1; related alert=2; mode=replay; topology=0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332
+  ACT|Storm C01; root alert=1; related alert=3; mode=replay; topology=0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332
+A|2|Router.ADT|Queue size 512 exceeds threshold|actions=0
+A|3|Router.ADT|Queue size 512 exceeds threshold|actions=0
+A|4|DB.Out.EHR|ERROR #6022: Gateway failed: SQLServer.EHR connection refused|actions=4
+  ACT|Storm A1; root alert=4; related alert=5; mode=replay; topology=0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332
+  ACT|Storm A1; root alert=4; related alert=6; mode=replay; topology=0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332
+  ACT|Storm A1; question=2d20c3f66d4fb82dafa72f7719e96c6c33c2360f13a853761fabed9ecd3506bd; answer=yes; The downstream failure of DB.Out.EHR caused messages to pile up in Router.ADT, resulting in a delayed ACK to HL7.In.ADT, wh
+  ACT|Storm A1; question=34c116108638048789d441a8f1f6c2d2538f935733032f4116b5d4505c74377d; answer=yes; Both alerts report the same error code (#6022) and the same component (SQLServer.EHR) is failing, indicating a shared cause
+A|5|Router.ADT|Queue size 512 exceeds threshold|actions=0
+A|6|HL7.In.ADT|ACK to sender delayed 45s: downstream queue full|actions=0

@@ -1,0 +1,98 @@
+# Storm.Tests.RunTests() output from scripts/demo.sh (compose smoke run, 2026-11-03 01:41 JST)
+      TestA1() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestA1 passed
+      TestA2() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestA2 passed
+      TestA3() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestA3 passed
+      TestA4() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestA4 passed
+      TestC01() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestC01 passed
+      TestC02() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestC02 passed
+      TestC03() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestC03 passed
+      TestC04() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestC04 passed
+      TestC05() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestC05 passed
+      TestC06() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestC06 passed
+      TestC07() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestC07 passed
+      TestC08() begins ...
+        AssertEquals:fixture available (passed)
+        AssertEquals:service status (passed)
+        AssertEquals:workflow final (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertEquals:same ID returns exact saved receipt (passed)
+        AssertEquals:same ID does not rerun workflow (passed)
+      TestC08 passed
+All PASSED: methods=12 assertions_passed=72 assertions_failed=0

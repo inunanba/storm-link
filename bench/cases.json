@@ -1,0 +1,75 @@
+[
+{"id":"C01","ambiguous":false,"note":"exact duplicates on one component","alerts":[
+ {"id":"a0","c":"Router.ADT","t":0,"text":"Queue size 512 exceeds threshold"},
+ {"id":"a1","c":"Router.ADT","t":30,"text":"Queue size 512 exceeds threshold"},
+ {"id":"a2","c":"Router.ADT","t":60,"text":"Queue size 512 exceeds threshold"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]},
+{"id":"C02","ambiguous":false,"note":"same error, varying message ids","alerts":[
+ {"id":"a0","c":"HL7.Out.LabA","t":0,"text":"ACK not received in 30s for message 8812"},
+ {"id":"a1","c":"HL7.Out.LabA","t":31,"text":"ACK not received in 30s for message 8813"},
+ {"id":"a2","c":"HL7.Out.LabA","t":62,"text":"ACK not received in 30s for message 8814"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]},
+{"id":"C03","ambiguous":false,"note":"inbound listener down -> downstream inactivity","alerts":[
+ {"id":"a0","c":"HL7.In.ADT","t":0,"text":"TCP listener on port 5000 stopped: address in use"},
+ {"id":"a1","c":"Router.ADT","t":600,"text":"Inactivity: no messages processed in 600s"},
+ {"id":"a2","c":"HL7.Out.LabA","t":605,"text":"Inactivity: no messages sent in 600s"},
+ {"id":"a3","c":"HL7.Out.RadB","t":606,"text":"Inactivity: no messages sent in 600s"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2","a3"]}]},
+{"id":"C04","ambiguous":false,"note":"two independent storms on unconnected branches","alerts":[
+ {"id":"a0","c":"FHIR.Out.Repo","t":0,"text":"HTTP 401 Unauthorized from repository (request 771)"},
+ {"id":"a1","c":"Claims.Out.Payer","t":5,"text":"SFTP authentication failed for user payer01"},
+ {"id":"a2","c":"FHIR.Out.Repo","t":20,"text":"HTTP 401 Unauthorized from repository (request 772)"},
+ {"id":"a3","c":"Claims.Out.Payer","t":65,"text":"SFTP authentication failed for user payer01"}],
+ "truth":[{"root":"a0","members":["a0","a2"]},{"root":"a1","members":["a1","a3"]}]},
+{"id":"C05","ambiguous":false,"note":"inbound parse error cascades","alerts":[
+ {"id":"a0","c":"Lab.In.ORU","t":0,"text":"ERROR #5002 parsing ORU^R01: segment OBX missing field 5"},
+ {"id":"a1","c":"Router.ORU","t":4,"text":"Validation failed for message 3311: required OBX-5 empty"},
+ {"id":"a2","c":"HL7.Out.EHRResults","t":900,"text":"Inactivity: no messages sent in 900s"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]},
+{"id":"C06","ambiguous":false,"note":"transform error starves outbound","alerts":[
+ {"id":"a0","c":"FHIR.Process.Transform","t":0,"text":"DTL error: Patient.birthDate invalid format '1980-13-01'"},
+ {"id":"a1","c":"FHIR.Process.Transform","t":10,"text":"DTL error: Patient.birthDate invalid format '1975-00-12'"},
+ {"id":"a2","c":"FHIR.Out.Repo","t":600,"text":"Inactivity: no messages sent in 600s"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]},
+{"id":"C07","ambiguous":false,"note":"file inbound missing directory","alerts":[
+ {"id":"a0","c":"FTP.In.Claims","t":0,"text":"Directory /in/claims not found on FTP server"},
+ {"id":"a1","c":"Claims.Process","t":1200,"text":"Inactivity: no messages processed in 1200s"},
+ {"id":"a2","c":"Claims.Out.Payer","t":1210,"text":"Inactivity: no messages sent in 1200s"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]},
+{"id":"C08","ambiguous":false,"note":"two unrelated failures at the same time","alerts":[
+ {"id":"a0","c":"DB.Out.EHR","t":0,"text":"ERROR #6022: Gateway failed: SQLServer.EHR connection refused"},
+ {"id":"a1","c":"FHIR.In.API","t":3,"text":"Cannot bind port 52773: permission denied"},
+ {"id":"a2","c":"DB.Out.EHR","t":30,"text":"ERROR #6022: Gateway failed: SQLServer.EHR connection refused"}],
+ "truth":[{"root":"a0","members":["a0","a2"]},{"root":"a1","members":["a1"]}]},
+{"id":"A1","ambiguous":true,"expect":"ai_should_win","note":"back-pressure: downstream DB failure makes upstream queues grow; most-upstream is a symptom","alerts":[
+ {"id":"a0","c":"DB.Out.EHR","t":0,"text":"ERROR #6022: Gateway failed: SQLServer.EHR connection refused"},
+ {"id":"a1","c":"Router.ADT","t":40,"text":"Queue size 512 exceeds threshold"},
+ {"id":"a2","c":"HL7.In.ADT","t":70,"text":"ACK to sender delayed 45s: downstream queue full"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]},
+{"id":"A2","ambiguous":true,"expect":"ai_should_win","note":"coincidental unrelated failure on a connected component","alerts":[
+ {"id":"a0","c":"HL7.In.ADT","t":0,"text":"TCP listener on port 5000 stopped: address in use"},
+ {"id":"a1","c":"Router.ADT","t":600,"text":"Inactivity: no messages processed in 600s"},
+ {"id":"a2","c":"HL7.Out.LabA","t":605,"text":"Inactivity: no messages sent in 600s"},
+ {"id":"a3","c":"HL7.Out.RadB","t":20,"text":"TLS handshake failed: remote certificate expired 2026-11-01"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]},{"root":"a3","members":["a3"]}]},
+{"id":"A3","ambiguous":true,"expect":"ai_should_win","note":"back-pressure from an external payer outage","alerts":[
+ {"id":"a0","c":"Claims.Out.Payer","t":0,"text":"HTTP 503 Service Unavailable from payer endpoint"},
+ {"id":"a1","c":"Claims.Process","t":50,"text":"Queue size 300 exceeds threshold"},
+ {"id":"a2","c":"FTP.In.Claims","t":90,"text":"File processing delayed: business process queue full"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]},
+{"id":"A4","ambiguous":true,"expect":"ai_should_win","note":"parse cascade plus an unrelated auth expiry on a downstream branch","alerts":[
+ {"id":"a0","c":"Lab.In.ORU","t":0,"text":"ERROR #5002 parsing ORU^R01: segment OBX missing field 5"},
+ {"id":"a1","c":"Router.ORU","t":4,"text":"Validation failed for message 3311: required OBX-5 empty"},
+ {"id":"a2","c":"FHIR.Out.Repo","t":8,"text":"HTTP 401 Unauthorized: OAuth token expired"}],
+ "truth":[{"root":"a0","members":["a0","a1"]},{"root":"a2","members":["a2"]}]},
+{"id":"A5","ambiguous":true,"expect":"ai_should_lose","note":"red herring text: downstream alert speculates a root cause; real root is upstream disk full","alerts":[
+ {"id":"a0","c":"HL7.In.ADT","t":0,"text":"Journal write failed: disk full on /iris/journal"},
+ {"id":"a1","c":"Router.ADT","t":5,"text":"Cannot save message: <FILEFULL>"},
+ {"id":"a2","c":"DB.Out.EHR","t":12,"text":"Slow responses; possible root cause: SQLServer.EHR overloaded"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]},
+{"id":"A6","ambiguous":true,"expect":"ai_should_lose","note":"different-looking downstream rejections share one upstream transform bug","alerts":[
+ {"id":"a0","c":"Router.ADT","t":0,"text":"DTL ADT_A08 warning: PID-3 empty after transform"},
+ {"id":"a1","c":"HL7.Out.LabA","t":3,"text":"Message rejected by LabA: invalid PID segment"},
+ {"id":"a2","c":"HL7.Out.RadB","t":4,"text":"AE NACK received: PID-3 required"}],
+ "truth":[{"root":"a0","members":["a0","a1","a2"]}]}
+]

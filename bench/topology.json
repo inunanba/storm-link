@@ -1,0 +1,15 @@
+{"production": "Demo.HospitalProduction",
+ "note": "component -> downstream components (message flow). External systems shown as targets of operations.",
+ "edges": {
+  "HL7.In.ADT": ["Router.ADT"],
+  "Router.ADT": ["HL7.Out.LabA", "HL7.Out.RadB", "DB.Out.EHR"],
+  "DB.Out.EHR": ["SQLServer.EHR"],
+  "FTP.In.Claims": ["Claims.Process"],
+  "Claims.Process": ["Claims.Out.Payer", "DB.Out.EHR"],
+  "Lab.In.ORU": ["Router.ORU"],
+  "Router.ORU": ["HL7.Out.EHRResults", "FHIR.Out.Repo"],
+  "FHIR.In.API": ["FHIR.Process.Transform"],
+  "FHIR.Process.Transform": ["FHIR.Out.Repo"],
+  "HL7.Out.LabA": [], "HL7.Out.RadB": [], "SQLServer.EHR": [], "Claims.Out.Payer": [],
+  "HL7.Out.EHRResults": [], "FHIR.Out.Repo": []
+ }}

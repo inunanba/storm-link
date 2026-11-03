@@ -1,0 +1,1 @@
+{"id":"A4","alerts":[{"id":"a0","c":"Lab.In.ORU","t":0,"text":"ERROR #5002 parsing ORU^R01: segment OBX missing field 5"},{"id":"a1","c":"Router.ORU","t":4,"text":"Validation failed for message 3311: required OBX-5 empty"},{"id":"a2","c":"FHIR.Out.Repo","t":8,"text":"HTTP 401 Unauthorized: OAuth token expired"}]}

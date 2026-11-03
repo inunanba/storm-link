@@ -1,0 +1,51 @@
+{
+ "A1:ROOT:a2:a0": {
+  "answer": "yes",
+  "reason": "The downstream failure of DB.Out.EHR caused messages to pile up in Router.ADT, resulting in a delayed ACK to HL7.In.ADT, which triggered the upstream alert.",
+  "question": "Upstream alert on HL7.In.ADT at second 70 says 'ACK to sender delayed 45s: downstream queue full'. Downstream alert on DB.Out.EHR at second 0 says 'ERROR #6022: Gateway failed: SQLServer.EHR connection refused'. Path: HL7.In.ADT -> Router.ADT -> DB.Out.EHR. When the downstream component fails, messages pile up upstream. Did the downstream failure cause the upstream alert?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 4.9
+ },
+ "A1:COINC:a0:a0": {
+  "answer": "yes",
+  "reason": "Both alerts report the same error code (#6022) and the same component (SQLServer.EHR) is failing, indicating a shared cause.",
+  "question": "Root alert on DB.Out.EHR at second 0 says 'ERROR #6022: Gateway failed: SQLServer.EHR connection refused'. Other alert on DB.Out.EHR at second 0 says 'ERROR #6022: Gateway failed: SQLServer.EHR connection refused'. Path: DB.Out.EHR. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.2
+ },
+ "A2:COINC:a0:a3": {
+  "answer": "no",
+  "reason": "The root alert is related to a TCP listener issue, while the downstream alert is related to a TLS handshake issue, indicating different underlying problems.",
+  "question": "Root alert on HL7.In.ADT at second 0 says 'TCP listener on port 5000 stopped: address in use'. Other alert on HL7.Out.RadB at second 20 says 'TLS handshake failed: remote certificate expired 2026-11-01'. Path: HL7.In.ADT -> Router.ADT -> HL7.Out.RadB. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.3
+ },
+ "A3:ROOT:a2:a0": {
+  "answer": "yes",
+  "reason": "The downstream failure of Claims.Process caused the business process queue to become full, leading to the upstream alert on FTP.In.Claims.",
+  "question": "Upstream alert on FTP.In.Claims at second 90 says 'File processing delayed: business process queue full'. Downstream alert on Claims.Out.Payer at second 0 says 'HTTP 503 Service Unavailable from payer endpoint'. Path: FTP.In.Claims -> Claims.Process -> Claims.Out.Payer. When the downstream component fails, messages pile up upstream. Did the downstream failure cause the upstream alert?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.2
+ },
+ "A3:COINC:a0:a0": {
+  "answer": "yes",
+  "reason": "Both alerts are triggered by the same root cause: the payer endpoint is unavailable, causing a service unavailable error.",
+  "question": "Root alert on Claims.Out.Payer at second 0 says 'HTTP 503 Service Unavailable from payer endpoint'. Other alert on Claims.Out.Payer at second 0 says 'HTTP 503 Service Unavailable from payer endpoint'. Path: Claims.Out.Payer. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.8
+ },
+ "A4:COINC:a0:a2": {
+  "answer": "no",
+  "reason": "The root alert is related to a specific segment (OBX) in the ORU^R01 message, while the downstream alert is related to an OAuth token expiration, which is a separate issue.",
+  "question": "Root alert on Lab.In.ORU at second 0 says 'ERROR #5002 parsing ORU^R01: segment OBX missing field 5'. Other alert on FHIR.Out.Repo at second 8 says 'HTTP 401 Unauthorized: OAuth token expired'. Path: Lab.In.ORU -> Router.ORU -> FHIR.Out.Repo. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 4.1
+ },
+ "A5:COINC:a0:a1": {
+  "answer": "yes",
+  "reason": "Both alerts indicate a disk full condition, suggesting that the downstream failure is a result of the upstream failure.",
+  "question": "Root alert on HL7.In.ADT at second 0 says 'Journal write failed: disk full on /iris/journal'. Other alert on Router.ADT at second 5 says 'Cannot save message: <FILEFULL>'. Path: HL7.In.ADT -> Router.ADT. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.9
+ }
+}

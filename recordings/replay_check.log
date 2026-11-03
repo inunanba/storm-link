@@ -1,0 +1,25 @@
+mode: REPLAY  cases=14 clear=8 ambiguous=6
+
+| method | all | clear | ambiguous | C01 | C02 | C03 | C04 | C05 | C06 | C07 | C08 | A1 | A2 | A3 | A4 | A5 | A6 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 built-in exact | 2/14 | 2/8 | 0/6 | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| 2 normalized text | 4/14 | 4/8 | 0/6 | ✓ | ✓ | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| 3 graph rule | 10/14 | 8/8 | 2/6 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ |
+| 4 graph+AI (3B, gated) | 6/14 | 4/8 | 2/6 | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ |
+
+AI trace (gate verdicts):
+  C01 ('C01:a0:a0,a1,a2', 'ACCEPT', 'a0', [], 'Analysis of topology and message flow indicates that the root cause is Alert a0.')
+  C02 ('C02:a0:a0,a1,a2', 'ACCEPT', 'a0', [], 'Analysis of the topology rule and message flow indicates that the root cause is Alert a0.')
+  C03 ('C03:a0:a0,a1,a2,a3', 'ACCEPT', 'a0', [], 'Analysis of the topology rule and message flow indicates that Alert a0 is the root cause.')
+  C04 ('C04:a0:a0,a2', 'ACCEPT', 'a0', [], 'Analysis of alert messages and topology rule')
+  C04 ('C04:a1:a1,a3', 'ACCEPT', 'a1', ['a3'], 'Alerts were grouped together by a topology rule.')
+  C05 ('C05:a0:a0,a1,a2', 'ACCEPT', 'a0', ['a2'], 'Analysis of topology rule and message flow')
+  C06 ('C06:a0:a0,a1,a2', 'ACCEPT', 'a0', ['a2'], 'Analyzing alerts to determine the root cause and related alerts')
+  C07 ('C07:a0:a0,a1,a2', 'ACCEPT', 'a0', ['a2'], 'Analysis of alert flow and topology rule')
+  C08 ('C08:a0:a0,a2', 'ACCEPT', 'a0', [], 'Analysis of topology rule and message flow')
+  A1 ('A1:a2:a0,a1,a2', 'REJECT detaches more than half', 'a2', ['a0', 'a1'], 'Analysis of topology rule and message flow')
+  A2 ('A2:a0:a0,a3,a1,a2', 'ACCEPT', 'a0', ['a3'], 'Analysis of topology and message flow')
+  A3 ('A3:a2:a0,a1,a2', 'ACCEPT', 'a2', ['a0'], 'Analysis of topology rule and message flow')
+  A4 ('A4:a0:a0,a1,a2', 'ACCEPT', 'a2', ['a1'], 'Analysis of the topology rule and message flow indicates that the root cause is the HTTP 401 Unauthorized: OAuth token expired (a2) alert from FHIR.Out.Repo.')
+  A5 ('A5:a0:a0,a1,a2', 'ACCEPT', 'a0', ['a2'], 'Analysis of the topology rule and message flow indicates that the root cause is Alert a0.')
+  A6 ('A6:a0:a0,a1,a2', 'ACCEPT', 'a0', [], 'Analysis of the topology rule and message flow indicates that Alert a0 is the root cause.')

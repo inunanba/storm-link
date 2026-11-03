@@ -1,0 +1,41 @@
+name: ${STORM_PROJECT:-stormlink}
+services:
+  worker:
+    image: storm-private:build-a-r1
+    build:
+      context: .
+      args:
+        EAP_IMAGE_REF: ${EAP_IMAGE_REF:-iris-ai-hub:local154}
+      network: none
+    pull_policy: never
+    entrypoint: ["python3", "-B", "/opt/storm/worker.py"]
+    command: []
+    volumes:
+      - ./:/opt/storm:ro
+    environment:
+      STORM_MODE: ${STORM_MODE:-replay}
+      STORM_MODEL: ${STORM_MODEL:-llama3.2-3b-ctx16k:latest}
+      STORM_OLLAMA_URL: ${STORM_OLLAMA_URL:-http://host.docker.internal:11434}
+    # Shares the IRIS network namespace: reachable only as 127.0.0.1:8088 from IRIS, never published.
+    network_mode: "service:iris"
+    depends_on:
+      - iris
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8088/health',timeout=2).read()"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+  iris:
+    image: storm-private:build-a-r1
+    pull_policy: never
+    init: true
+    command: ["--after", "iris session IRIS -U USER < /opt/storm/init.script"]
+    ports:
+      - "${STORM_PORTAL_BIND:-127.0.0.1:52774}:52773"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    healthcheck:
+      test: ["CMD-SHELL", "iris session IRIS -U USER '##class(Storm.Health).Check()'"]
+      interval: 10s
+      timeout: 5s
+      retries: 18

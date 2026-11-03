@@ -1,0 +1,107 @@
+{
+ "H01:ROOT:a2:a0": {
+  "answer": "no",
+  "reason": "The upstream alert indicates a delay in sending a reply to the lab, which could be a cause of the downstream connection refusal, as the router backlog could prevent the reply from being sent.",
+  "question": "Upstream alert on Lab.In.ORU at second 95 says 'Reply to sending lab delayed 60s, router backlog'. Downstream alert on HL7.Out.EHRResults at second 0 says 'Connection to 10.2.4.17:6661 refused'. Path: Lab.In.ORU -> Router.ORU -> HL7.Out.EHRResults. Is the upstream alert only a symptom of the downstream failure?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.8
+ },
+ "H01:COINC:a2:a0": {
+  "answer": "no",
+  "reason": "The root alert on Lab.In.ORU indicates a delay in sending a reply, while the downstream alert on HL7.Out.EHRResults indicates a connection refused, suggesting a different issue with the HL7 protocol.",
+  "question": "Root alert on Lab.In.ORU at second 95 says 'Reply to sending lab delayed 60s, router backlog'. Other alert on HL7.Out.EHRResults at second 0 says 'Connection to 10.2.4.17:6661 refused'. Path: Lab.In.ORU -> Router.ORU -> HL7.Out.EHRResults. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.7
+ },
+ "H02:COINC:a0:a1": {
+  "answer": "no",
+  "reason": "The root alert is related to a login issue, while the downstream alert is related to an SSL certificate verification issue, which may be caused by a different problem, such as a misconfigured certificate or a network issue.",
+  "question": "Root alert on FTP.In.Claims at second 0 says '530 Login incorrect for user claimsdrop'. Other alert on Claims.Out.Payer at second 12 says 'SSL error: certificate verify failed (self-signed certificate in chain)'. Path: FTP.In.Claims -> Claims.Process -> Claims.Out.Payer. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 4.3
+ },
+ "H04:ROOT:a2:a0": {
+  "answer": "no",
+  "reason": "The upstream alert indicates a queue full, which could be caused by a processing issue, while the downstream alert indicates a HTTP 429 Too Many Requests, which is typically a server-side issue, suggesting a different root cause.",
+  "question": "Upstream alert on FHIR.In.API at second 45 says 'Client requests waiting over 20s: processing queue full'. Downstream alert on FHIR.Out.Repo at second 0 says 'HTTP 429 Too Many Requests from FHIR repository'. Path: FHIR.In.API -> FHIR.Process.Transform -> FHIR.Out.Repo. Is the upstream alert only a symptom of the downstream failure?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 4.1
+ },
+ "H04:COINC:a2:a0": {
+  "answer": "no",
+  "reason": "The root alert indicates a processing queue full, while the downstream alert indicates an HTTP 429 Too Many Requests, which is a different issue related to rate limiting.",
+  "question": "Root alert on FHIR.In.API at second 45 says 'Client requests waiting over 20s: processing queue full'. Other alert on FHIR.Out.Repo at second 0 says 'HTTP 429 Too Many Requests from FHIR repository'. Path: FHIR.In.API -> FHIR.Process.Transform -> FHIR.Out.Repo. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.2
+ },
+ "H05:COINC:a0:a2": {
+  "answer": "no",
+  "reason": "The root alert is related to a HL7 message type issue, while the downstream alert is related to a remote connection issue, which are likely unrelated problems.",
+  "question": "Root alert on HL7.In.ADT at second 0 says 'ERROR #5002: invalid MSH-9 message type 'ADT^Z99''. Other alert on HL7.Out.LabA at second 9 says 'Remote LabA closed connection: account password expired'. Path: HL7.In.ADT -> Router.ADT -> HL7.Out.LabA. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.2
+ },
+ "H06:ROOT:a0:a1": {
+  "answer": "no",
+  "reason": "The upstream alert indicates a business process error, suggesting a deeper issue with the Claims.Process component, whereas the downstream alert is a direct result of a SQLServer.EHR login timeout, indicating a specific problem with the DB.Out.EHR component.",
+  "question": "Upstream alert on Claims.Process at second 0 says 'Business process error: call to DB.Out.EHR failed with timeout'. Downstream alert on DB.Out.EHR at second 1 says 'ERROR #6022: SQLServer.EHR login timeout expired'. Path: Claims.Process -> DB.Out.EHR. Is the upstream alert only a symptom of the downstream failure?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.9
+ },
+ "H07:COINC:a0:a2": {
+  "answer": "no",
+  "reason": "The root alert is related to a DTL error in FHIR.Process.Transform, while the downstream alert is related to a DNS resolution issue in FHIR.Out.Repo, which are likely unrelated issues.",
+  "question": "Root alert on FHIR.Process.Transform at second 0 says 'DTL error: unknown code system 'urn:oid:2.16.999' in Observation.code'. Other alert on FHIR.Out.Repo at second 40 says 'Could not resolve host fhir-repo.internal: Name or service not known'. Path: FHIR.Process.Transform -> FHIR.Out.Repo. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.3
+ },
+ "H08:COINC:a0:a1": {
+  "answer": "no",
+  "reason": "The root alert is related to a missing lookup table, while the downstream alert is related to an unrecognized OBX-3 code, which may be a separate issue.",
+  "question": "Root alert on Router.ORU at second 0 says 'Lookup table 'LabCodeMap' not found'. Other alert on HL7.Out.EHRResults at second 4 says 'NACK AR: OBX-3 code not recognised'. Path: Router.ORU -> HL7.Out.EHRResults. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.0
+ },
+ "H08:COINC:a0:a2": {
+  "answer": "no",
+  "reason": "The root alert on Router.ORU is related to a missing lookup table, while the other alert on FHIR.Out.Repo is related to a missing coding in an Observation, which is a different data structure.",
+  "question": "Root alert on Router.ORU at second 0 says 'Lookup table 'LabCodeMap' not found'. Other alert on FHIR.Out.Repo at second 5 says 'HTTP 422 Unprocessable Entity: Observation.code has no coding'. Path: Router.ORU -> FHIR.Out.Repo. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.6
+ },
+ "H09:ROOT:a2:a0": {
+  "answer": "no",
+  "reason": "The upstream alert indicates a pause in the business process, which could be a cause of the downstream failure, rather than just a symptom of it.",
+  "question": "Upstream alert on FTP.In.Claims at second 120 says 'Pickup paused: downstream business process backlog'. Downstream alert on Claims.Out.Payer at second 0 says 'SFTP write failed: remote disk quota exceeded'. Path: FTP.In.Claims -> Claims.Process -> Claims.Out.Payer. Is the upstream alert only a symptom of the downstream failure?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.7
+ },
+ "H09:COINC:a2:a0": {
+  "answer": "no",
+  "reason": "The root alert on FTP.In.Claims indicates a pause in the business process due to a backlog, while the downstream alert on Claims.Out.Payer indicates a failure to write to SFTP due to a remote disk quota issue, which appears to be unrelated to the backlog.",
+  "question": "Root alert on FTP.In.Claims at second 120 says 'Pickup paused: downstream business process backlog'. Other alert on Claims.Out.Payer at second 0 says 'SFTP write failed: remote disk quota exceeded'. Path: FTP.In.Claims -> Claims.Process -> Claims.Out.Payer. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 4.5
+ },
+ "H10:COINC:a0:a1": {
+  "answer": "no",
+  "reason": "The root alert is related to a TLS handshake failure, which is a network issue, while the downstream alert is related to a SQL deadlock, which is a database issue with no apparent connection to the TLS failure.",
+  "question": "Root alert on HL7.In.ADT at second 0 says 'TLS handshake with sender failed: unknown CA'. Other alert on DB.Out.EHR at second 25 says 'SQLCODE -114: deadlock victim, transaction rolled back'. Path: HL7.In.ADT -> Router.ADT -> DB.Out.EHR. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.6
+ },
+ "H12:COINC:a0:a1": {
+  "answer": "no",
+  "reason": "The root alert on FTP.In.Claims is related to the ISA segment length, while the other alert on Claims.Process is related to envelope validation, which could be caused by different issues.",
+  "question": "Root alert on FTP.In.Claims at second 0 says 'File claims_1102.x12 rejected: ISA segment length 105, expected 106'. Other alert on Claims.Process at second 2 says 'Envelope validation failed for batch 1102'. Path: FTP.In.Claims -> Claims.Process. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.4
+ },
+ "H12:COINC:a0:a2": {
+  "answer": "no",
+  "reason": "The root alert on FTP.In.Claims is related to a specific file claim issue, while the other alert on DB.Out.EHR is a more general gateway failure issue that may be unrelated to the file claim issue.",
+  "question": "Root alert on FTP.In.Claims at second 0 says 'File claims_1102.x12 rejected: ISA segment length 105, expected 106'. Other alert on DB.Out.EHR at second 10 says 'ERROR #6022: Gateway failed: network path not found'. Path: FTP.In.Claims -> Claims.Process -> DB.Out.EHR. Is the other alert caused by the same problem as the root?",
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.9
+ }
+}

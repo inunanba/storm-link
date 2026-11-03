@@ -1,0 +1,1 @@
+{"id":"C06","alerts":[{"id":"a0","c":"FHIR.Process.Transform","t":0,"text":"DTL error: Patient.birthDate invalid format '1980-13-01'"},{"id":"a1","c":"FHIR.Process.Transform","t":10,"text":"DTL error: Patient.birthDate invalid format '1975-00-12'"},{"id":"a2","c":"FHIR.Out.Repo","t":600,"text":"Inactivity: no messages sent in 600s"}]}

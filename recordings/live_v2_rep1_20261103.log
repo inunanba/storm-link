@@ -1,0 +1,42 @@
+
+## dev set (LIVE) cases=14 clear=8 ambiguous=6  AI-flagged: A1, A2, A3, A4, A5
+| method | all | clear | ambiguous | C01 | C02 | C03 | C04 | C05 | C06 | C07 | C08 | A1 | A2 | A3 | A4 | A5 | A6 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 exact-match simulation | 2/14 | 2/8 | 0/6 | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| 2 normalized text | 4/14 | 4/8 | 0/6 | ✓ | ✓ | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| 3 graph rule | 10/14 | 8/8 | 2/6 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ |
+| 5 rule + detector + 3B yes/no (gated) | 14/14 | 8/8 | 6/6 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+AI wins over rule: ['A1', 'A2', 'A3', 'A4']   AI losses vs rule: -
+   ('A1:ROOT:a2:a0', 'yes', 'The downstream failure of DB.Out.EHR caused messages to pile up in Router.ADT, resulting in a delayed ACK to HL7.In.ADT, which triggered the upstream alert.')
+   ('A1:COINC:a0:a0', 'yes', 'Both alerts report the same error code (#6022) and the same component (SQLServer.EHR) is involved, indicating a shared root cause.')
+   ('A2:COINC:a0:a3', 'no', 'The root alert on HL7.In.ADT at second 0 is related to a TCP listener issue, while the downstream alert on HL7.Out.RadB is related to a TLS handshake failure, which could be caused by a different issue such as a certificate expiration or a misconfigured TLS configuration.')
+   ('A3:ROOT:a2:a0', 'yes', 'The downstream failure of Claims.Process caused the business process queue to become full, leading to the upstream alert on FTP.In.Claims.')
+   ('A3:COINC:a0:a0', 'yes', 'Both alerts are triggered by the same root cause: the payer endpoint is unavailable, causing a service unavailability')
+   ('A4:COINC:a0:a2', 'no', 'The root alert on Lab.In.ORU is related to a specific segment (OBX) missing a field, while the other alert on FHIR.Out.Repo is related to an OAuth token expiration, which is a separate issue.')
+   ('A5:COINC:a0:a1', 'yes', 'Both alerts indicate a disk full condition, which is the root cause of the failure')
+
+## heldout set (LIVE) cases=15 clear=3 ambiguous=12  AI-flagged: H01, H02, H04, H05, H06, H07, H08, H09, H10, H12
+| method | all | clear | ambiguous | H01 | H02 | H03 | H04 | H05 | H06 | H07 | H08 | H09 | H10 | H11 | H12 | HC1 | HC2 | HC3 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 exact-match simulation | 2/15 | 1/3 | 1/12 | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
+| 2 normalized text | 3/15 | 2/3 | 1/12 | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ |
+| 3 graph rule | 6/15 | 3/3 | 3/12 | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✓ | ✗ | ✓ | ✓ | ✓ |
+| 5 rule + detector + 3B yes/no (gated) | 11/15 | 3/3 | 8/12 | ✓ | ✓ | ✓ | ✗ | ✓ | ✗ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
+AI wins over rule: ['H01', 'H02', 'H05', 'H07', 'H09', 'H10']   AI losses vs rule: ['H08']
+   ('H01:ROOT:a2:a0', 'yes', 'The downstream failure of HL7.Out.EHRResults at second 0 caused the router backlog, which in turn caused the upstream alert on Lab.In.ORU at second 95.')
+   ('H01:COINC:a0:a0', 'yes', 'Both alerts are reporting the same issue with a connection refusal to the same host and port')
+   ('H02:COINC:a0:a1', 'no', 'The root alert is related to a login failure, while the downstream alert is related to an SSL verification issue, indicating different root causes.')
+   ('H04:ROOT:a2:a0', 'no', "The upstream alert is caused by a client request waiting over 20s, which is a timeout issue, whereas the downstream alert is caused by an HTTP 429 Too Many Requests, which is a different issue related to the FHIR repository's capacity to handle requests.")
+   ('H04:COINC:a2:a0', 'yes', 'Both alerts indicate a processing queue full, suggesting that the root failure caused the downstream alert.')
+   ('H05:COINC:a0:a2', 'no', 'The root alert is related to a HL7 message type issue, while the downstream alert is related to a closed connection due to an expired account password, which are likely unrelated problems.')
+   ('H06:ROOT:a0:a1', 'no', 'The downstream failure occurred 1 second after the upstream failure, indicating that the upstream failure was likely a result of a timeout or a temporary issue, rather than a direct cause of the downstream failure.')
+   ('H07:COINC:a0:a2', 'no', 'The root alert is related to a DTL error in FHIR.Process.Transform, while the downstream alert is related to a DNS resolution issue in FHIR.Out.Repo, which are likely unrelated issues.')
+   ('H08:COINC:a0:a1', 'no', 'The root alert on Router.ORU is related to a missing lookup table, while the downstream alert on HL7.Out.EHRResults is related to an unrecognized OBX-3 code, which may be a separate issue.')
+   ('H08:COINC:a0:a2', 'yes', "Both alerts involve missing or invalid data, specifically the 'LabCodeMap' lookup table and the 'Observation.code' coding, which are likely related to the same data processing issue.")
+   ('H09:ROOT:a2:a0', 'yes', 'The downstream failure of SFTP write to Payer caused the upstream alert of Claims process backlog, as the Claims process is unable to proceed without writing to Payer.')
+   ('H09:COINC:a0:a0', 'yes', 'Both alerts are triggered by the same root cause: the SFTP write failed due to remote disk quota exceeded')
+   ('H10:COINC:a0:a1', 'no', 'The root alert is related to a TLS handshake failure, while the downstream alert is related to a SQL deadlock, indicating different potential causes.')
+   ('H12:COINC:a0:a1', 'no', 'The root alert on FTP.In.Claims is related to the ISA segment length, while the other alert on Claims.Process is related to envelope validation, which is a different aspect of the claims processing pipeline.')
+   ('H12:COINC:a0:a2', 'no', 'The root alert on FTP.In.Claims is related to a specific file claim issue, while the other alert on DB.Out.EHR is a more general gateway failure, indicating a different potential cause.')
+   ('GATE REJECT', 'H12')
+elapsed_s=71

@@ -1,0 +1,2 @@
+Set ok=##class(Storm.Tests).RunTests()
+Halt

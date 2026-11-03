@@ -1,0 +1,1 @@
+{"id":"C02","alerts":[{"id":"a0","c":"HL7.Out.LabA","t":0,"text":"ACK not received in 30s for message 8812"},{"id":"a1","c":"HL7.Out.LabA","t":31,"text":"ACK not received in 30s for message 8813"},{"id":"a2","c":"HL7.Out.LabA","t":62,"text":"ACK not received in 30s for message 8814"}]}

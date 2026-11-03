@@ -1,0 +1,207 @@
+{
+ "C01:a0:a0,a1,a2": {
+  "reason": "Analysis of topology and message flow indicates that the root cause is Alert a0.",
+  "related_ids": [
+   "a1",
+   "a2"
+  ],
+  "root_id": "a0",
+  "separate_ids": [],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.2,
+  "eval_tokens": 56,
+  "prompt_tokens": 293
+ },
+ "C02:a0:a0,a1,a2": {
+  "reason": "Analysis of the topology rule and message flow indicates that the root cause is Alert a0.",
+  "related_ids": [
+   "a1",
+   "a2"
+  ],
+  "root_id": "a0",
+  "separate_ids": [],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.4,
+  "eval_tokens": 58,
+  "prompt_tokens": 290
+ },
+ "C03:a0:a0,a1,a2,a3": {
+  "reason": "Analysis of the topology rule and message flow indicates that Alert a0 is the root cause.",
+  "related_ids": [
+   "a1",
+   "a2",
+   "a3"
+  ],
+  "root_id": "a0",
+  "separate_ids": [],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.8,
+  "eval_tokens": 64,
+  "prompt_tokens": 331
+ },
+ "C04:a0:a0,a2": {
+  "reason": "Analysis of alert messages and topology rule",
+  "related_ids": [
+   "a2"
+  ],
+  "root_id": "a0",
+  "separate_ids": [],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.4,
+  "eval_tokens": 43,
+  "prompt_tokens": 237
+ },
+ "C04:a1:a1,a3": {
+  "reason": "Alerts were grouped together by a topology rule.",
+  "related_ids": [
+   "a1"
+  ],
+  "root_id": "a1",
+  "separate_ids": [
+   "a3"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.8,
+  "eval_tokens": 45,
+  "prompt_tokens": 229
+ },
+ "C05:a0:a0,a1,a2": {
+  "reason": "Analysis of topology rule and message flow",
+  "related_ids": [
+   "a1"
+  ],
+  "root_id": "a0",
+  "separate_ids": [
+   "a2"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.2,
+  "eval_tokens": 43,
+  "prompt_tokens": 293
+ },
+ "C06:a0:a0,a1,a2": {
+  "reason": "Analyzing alerts to determine the root cause and related alerts",
+  "related_ids": [
+   "a1"
+  ],
+  "root_id": "a0",
+  "separate_ids": [
+   "a2"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.8,
+  "eval_tokens": 47,
+  "prompt_tokens": 288
+ },
+ "C07:a0:a0,a1,a2": {
+  "reason": "Analysis of alert flow and topology rule",
+  "related_ids": [
+   "a1"
+  ],
+  "root_id": "a0",
+  "separate_ids": [
+   "a2"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.7,
+  "eval_tokens": 43,
+  "prompt_tokens": 273
+ },
+ "C08:a0:a0,a2": {
+  "reason": "Analysis of topology rule and message flow",
+  "related_ids": [
+   "a2"
+  ],
+  "root_id": "a0",
+  "separate_ids": [],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.7,
+  "eval_tokens": 43,
+  "prompt_tokens": 241
+ },
+ "A1:a2:a0,a1,a2": {
+  "reason": "Analysis of topology rule and message flow",
+  "related_ids": [
+   "a2"
+  ],
+  "root_id": "a2",
+  "separate_ids": [
+   "a0",
+   "a1"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.7,
+  "eval_tokens": 43,
+  "prompt_tokens": 285
+ },
+ "A2:a0:a0,a3,a1,a2": {
+  "reason": "Analysis of topology and message flow",
+  "related_ids": [
+   "a1",
+   "a2"
+  ],
+  "root_id": "a0",
+  "separate_ids": [
+   "a3"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.7,
+  "eval_tokens": 47,
+  "prompt_tokens": 335
+ },
+ "A3:a2:a0,a1,a2": {
+  "reason": "Analysis of topology rule and message flow",
+  "related_ids": [
+   "a1"
+  ],
+  "root_id": "a2",
+  "separate_ids": [
+   "a0"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 2.6,
+  "eval_tokens": 43,
+  "prompt_tokens": 262
+ },
+ "A4:a0:a0,a1,a2": {
+  "reason": "Analysis of the topology rule and message flow indicates that the root cause is the HTTP 401 Unauthorized: OAuth token expired (a2) alert from FHIR.Out.Repo.",
+  "related_ids": [
+   "a0"
+  ],
+  "root_id": "a2",
+  "separate_ids": [
+   "a1"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 5.7,
+  "eval_tokens": 70,
+  "prompt_tokens": 289
+ },
+ "A5:a0:a0,a1,a2": {
+  "reason": "Analysis of the topology rule and message flow indicates that the root cause is Alert a0.",
+  "related_ids": [
+   "a1"
+  ],
+  "root_id": "a0",
+  "separate_ids": [
+   "a2"
+  ],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.2,
+  "eval_tokens": 53,
+  "prompt_tokens": 284
+ },
+ "A6:a0:a0,a1,a2": {
+  "reason": "Analysis of the topology rule and message flow indicates that Alert a0 is the root cause.",
+  "related_ids": [
+   "a1",
+   "a2"
+  ],
+  "root_id": "a0",
+  "separate_ids": [],
+  "model": "llama3.2-3b-ctx16k:latest",
+  "latency_s": 3.1,
+  "eval_tokens": 58,
+  "prompt_tokens": 291
+ }
+}

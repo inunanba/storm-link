@@ -1,0 +1,38 @@
+
+## dev set (LIVE) cases=14 clear=8 ambiguous=6  AI-flagged: A1, A2, A3, A4, A5
+| method | all | clear | ambiguous | C01 | C02 | C03 | C04 | C05 | C06 | C07 | C08 | A1 | A2 | A3 | A4 | A5 | A6 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 3 graph rule | 10/14 | 8/8 | 2/6 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ |
+| 5 rule + detector + 3B yes/no (gated) | 11/14 | 8/8 | 3/6 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✗ | ✓ | ✗ | ✓ |
+AI wins over rule: ['A2', 'A4']   AI losses vs rule: ['A5']
+   ('A1:ROOT:a2:a0', 'no', 'The upstream alert indicates a delay in ACK response, which could be caused by the downstream queue being full, but the downstream alert indicates a connection refusal, suggesting a more fundamental issue with the SQLServer.EHR connection.')
+   ('A1:COINC:a2:a0', 'no', 'The root alert indicates a delay in ACK response due to a downstream queue full, while the other alert indicates a connection refusal, suggesting a different issue with the SQLServer.EHR connection.')
+   ('A2:COINC:a0:a3', 'no', 'The root alert is related to a TCP listener issue, while the downstream alert is related to a TLS handshake issue, indicating different underlying problems.')
+   ('A3:ROOT:a2:a0', 'no', 'The upstream alert indicates a queue full, which could be caused by multiple factors, including but not limited to, a downstream failure, network issues, or system configuration problems, making it unlikely that the upstream alert is solely a symptom of the downstream failure.')
+   ('A3:COINC:a2:a0', 'no', 'The root alert is related to a queue full, while the downstream alert is related to a service unavailability, which could be caused by various factors such as network issues, server overload, or payer endpoint maintenance.')
+   ('A4:COINC:a0:a2', 'no', 'The root alert on Lab.In.ORU is related to a specific segment (OBX) missing a field, while the other alert on FHIR.Out.Repo is related to an OAuth token expiration, which is a separate issue.')
+   ('A5:COINC:a0:a1', 'no', 'The root alert is related to disk full on /iris/journal, while the other alert is related to saving a message, which could be caused by various reasons, not necessarily disk full.')
+
+## heldout set (LIVE) cases=15 clear=3 ambiguous=12  AI-flagged: H01, H02, H04, H05, H06, H07, H08, H09, H10, H12
+| method | all | clear | ambiguous | H01 | H02 | H03 | H04 | H05 | H06 | H07 | H08 | H09 | H10 | H11 | H12 | HC1 | HC2 | HC3 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 3 graph rule | 6/15 | 3/3 | 3/12 | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✓ | ✗ | ✓ | ✓ | ✓ |
+| 5 rule + detector + 3B yes/no (gated) | 10/15 | 3/3 | 7/12 | ✗ | ✓ | ✓ | ✗ | ✓ | ✗ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
+AI wins over rule: ['H02', 'H05', 'H07', 'H10']   AI losses vs rule: -
+   ('H01:ROOT:a2:a0', 'no', 'The upstream alert indicates a delay in sending a reply to the lab, which could be a cause of the downstream connection refusal, as the router backlog could prevent the reply from being sent.')
+   ('H01:COINC:a2:a0', 'no', 'The root alert on Lab.In.ORU indicates a delay in sending a reply, while the downstream alert on HL7.Out.EHRResults indicates a connection refused, suggesting a different issue with the HL7 protocol.')
+   ('H02:COINC:a0:a1', 'no', 'The root alert is related to a login issue, while the downstream alert is related to an SSL certificate verification issue, which may be caused by a different problem, such as a misconfigured certificate or a network issue.')
+   ('H04:ROOT:a2:a0', 'no', 'The upstream alert indicates a queue full, which could be caused by a processing issue, while the downstream alert indicates a HTTP 429 Too Many Requests, which is typically a server-side issue, suggesting a different root cause.')
+   ('H04:COINC:a2:a0', 'no', 'The root alert indicates a processing queue full, while the downstream alert indicates an HTTP 429 Too Many Requests, which is a different issue related to rate limiting.')
+   ('H05:COINC:a0:a2', 'no', 'The root alert is related to a HL7 message type issue, while the downstream alert is related to a remote connection issue, which are likely unrelated problems.')
+   ('H06:ROOT:a0:a1', 'no', 'The upstream alert indicates a business process error, suggesting a deeper issue with the Claims.Process component, whereas the downstream alert is a direct result of a SQLServer.EHR login timeout, indicating a specific problem with the DB.Out.EHR component.')
+   ('H07:COINC:a0:a2', 'no', 'The root alert is related to a DTL error in FHIR.Process.Transform, while the downstream alert is related to a DNS resolution issue in FHIR.Out.Repo, which are likely unrelated issues.')
+   ('H08:COINC:a0:a1', 'no', 'The root alert is related to a missing lookup table, while the downstream alert is related to an unrecognized OBX-3 code, which may be a separate issue.')
+   ('H08:COINC:a0:a2', 'no', 'The root alert on Router.ORU is related to a missing lookup table, while the other alert on FHIR.Out.Repo is related to a missing coding in an Observation, which is a different data structure.')
+   ('GATE REJECT', 'H08')
+   ('H09:ROOT:a2:a0', 'no', 'The upstream alert indicates a pause in the business process, which could be a cause of the downstream failure, rather than just a symptom of it.')
+   ('H09:COINC:a2:a0', 'no', 'The root alert on FTP.In.Claims indicates a pause in the business process due to a backlog, while the downstream alert on Claims.Out.Payer indicates a failure to write to SFTP due to a remote disk quota issue, which appears to be unrelated to the backlog.')
+   ('H10:COINC:a0:a1', 'no', 'The root alert is related to a TLS handshake failure, which is a network issue, while the downstream alert is related to a SQL deadlock, which is a database issue with no apparent connection to the TLS failure.')
+   ('H12:COINC:a0:a1', 'no', 'The root alert on FTP.In.Claims is related to the ISA segment length, while the other alert on Claims.Process is related to envelope validation, which could be caused by different issues.')
+   ('H12:COINC:a0:a2', 'no', 'The root alert on FTP.In.Claims is related to a specific file claim issue, while the other alert on DB.Out.EHR is a more general gateway failure issue that may be unrelated to the file claim issue.')
+   ('GATE REJECT', 'H12')

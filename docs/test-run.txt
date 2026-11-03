@@ -1,0 +1,23 @@
+test_01_all_recorded_cases_equal_original_engine (test_worker.WorkerTests.test_01_all_recorded_cases_equal_original_engine) ... ok
+test_02_exact_partition_all_cases (test_worker.WorkerTests.test_02_exact_partition_all_cases) ... ok
+test_03_metrics_are_recording_reproduction (test_worker.WorkerTests.test_03_metrics_are_recording_reproduction) ... ok
+test_04_clear_cases_never_call_model (test_worker.WorkerTests.test_04_clear_cases_never_call_model) ... ok
+test_05_runtime_labels_rejected (test_worker.WorkerTests.test_05_runtime_labels_rejected) ... ok
+test_06_invalid_runtime_fields (test_worker.WorkerTests.test_06_invalid_runtime_fields) ... ok
+test_07_alert_validation (test_worker.WorkerTests.test_07_alert_validation) ... ok
+test_08_duplicate_id_and_time_window (test_worker.WorkerTests.test_08_duplicate_id_and_time_window) ... ok
+test_09_answer_schema (test_worker.WorkerTests.test_09_answer_schema) ... ok
+test_10_idempotent_start_no_new_session (test_worker.WorkerTests.test_10_idempotent_start_no_new_session) ... ok
+test_11_storm_conflict (test_worker.WorkerTests.test_11_storm_conflict) ... ok
+test_12_forged_or_stale_answer (test_worker.WorkerTests.test_12_forged_or_stale_answer) ... ok
+test_13_answer_and_provider_replay_once (test_worker.WorkerTests.test_13_answer_and_provider_replay_once) ... ok
+test_14_missing_recording_does_not_make_up_answer (test_worker.WorkerTests.test_14_missing_recording_does_not_make_up_answer) ... ok
+test_15_fixed_destination_live_provider_and_cache (test_worker.WorkerTests.test_15_fixed_destination_live_provider_and_cache) ... ok
+test_16_hash_binds_text_and_order (test_worker.WorkerTests.test_16_hash_binds_text_and_order) ... ok
+test_17_graph_only_does_not_consult_provider (test_worker.WorkerTests.test_17_graph_only_does_not_consult_provider) ... ok
+test_18_http_contract_and_payload_bound (test_worker.WorkerTests.test_18_http_contract_and_payload_bound) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.533s
+
+OK

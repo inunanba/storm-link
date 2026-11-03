@@ -1,0 +1,1 @@
+{"id":"A3","alerts":[{"id":"a0","c":"Claims.Out.Payer","t":0,"text":"HTTP 503 Service Unavailable from payer endpoint"},{"id":"a1","c":"Claims.Process","t":50,"text":"Queue size 300 exceeds threshold"},{"id":"a2","c":"FTP.In.Claims","t":90,"text":"File processing delayed: business process queue full"}]}
