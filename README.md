@@ -28,6 +28,20 @@ docker compose up -d --build     # IRIS + worker, healthy in about 15 s once the
 4. **Traceable end to end.** Each storm is one Visual Trace session: Service → Process → Agent → Process → Service. The agent step shows the model, tool calls and duration.
 5. **Idempotent.** Resubmitting a storm ID returns the saved receipt with zero new alerts and zero new agent calls.
 
+## Community Idea implemented
+
+[DPI-I-689](https://ideas.intersystems.com/ideas/DPI-I-689): Use InterSystems Interoperability as a Traceability tool for GenAI LLM pipelines (status: Community Opportunity).
+
+Storm Link uses Visual Trace as the trace for every LLM call in the storm production:
+
+1. **What we needed.** When the production asks the model a yes/no question, that call should appear in the same Visual Trace session as the storm, with the model name, token counts and how long it took — without a separate tracing service.
+2. **What we built.** Each storm is one Interoperability session: `Storm.Service` → `Storm.Process` → `Storm.Agent` and back. Every agent call is a stored message; the reply carries the model, token usage and duration.
+3. **What you can see.** On storm A1 in live mode, Visual Trace shows both agent calls to `llama3.2-3b-ctx16k` (409 and 386 tokens, 10.9 s and 3.4 s). The same numbers are in the [live trace export](docs/trace-A1-C01-live.txt) and the screenshot below.
+
+![Visual Trace of storm A1, live mode — Community Idea DPI-I-689](docs/img/visual-trace-A1-live.png)
+
+The same flow also answers [DPI-I-627](https://ideas.intersystems.com/ideas/DPI-I-627) (AI assisted debug, Community Opportunity): when the topology graph cannot pick a single root, `%AI.Agent` assesses the conflicting alerts, answers the yes/no questions that settle the storm, and writes those reasons onto the Managed Alert that on-call already opens.
+
 ## Quick start
 
 Prerequisites: Docker with Compose, and the InterSystems IRIS 2026.3 AI Hub Community image (build 154) loaded locally. No licence key, API key or model download is needed.
@@ -39,7 +53,7 @@ docker compose up -d --build
 docker compose ps        # iris and worker show (healthy)
 ```
 
-IPM: the package is `storm-link` (module.xml at the repo root). In an IRIS 2026.3 AI Hub instance with IPM, load it from a clone with `zpm "load /path/to/storm-link"`.
+IPM: the package is `storm-link` (module.xml at the repo root). On an IRIS 2026.3 AI Hub instance with IPM, install from the public registry with `zpm "install storm-link"`, or load from a clone with `zpm "load /path/to/storm-link"`.
 
 | Destination | Address |
 |---|---|
