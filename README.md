@@ -147,6 +147,15 @@ Runs in plain Python with saved model answers, no key and no network. Per-case o
 
 Interoperability Production, `%AI.Agent`, Visual Trace, Managed Alerts, transactional receipts and `%UnitTest`, each with the reason it is used: [NATIVE_FEATURES.md](docs/NATIVE_FEATURES.md).
 
+### Technology bonuses used in this entry
+
+| Bonus | Where judges can see it |
+|---|---|
+| **Custom Adapter (+2)** | `Storm.WorkerAdapter` (custom outbound) is the Production adapter on `Storm.WorkerOp`. Every `/start` and `/answer` call to the private worker goes through that adapter, so Visual Trace shows Service → Process → WorkerOp → Process. |
+| **Embedded Python (+3)** | `Storm.Signature.Embed` / `FindSimilar` are IRIS methods with `Language = python` and `import iris`. They turn the alert set into a signature and run the VECTOR SQL from inside IRIS. |
+| **IRIS Vector Search (+2)** | Table `Storm_Signature` stores each FINAL storm as `VECTOR(DOUBLE, 32)`. After the graph (and agent, when needed) settles a storm, `VECTOR_COSINE` finds the nearest past storm and the match is written onto the root Managed Alert as an action reason. |
+
+
 ## Troubleshooting
 
 | Symptom | Fix |

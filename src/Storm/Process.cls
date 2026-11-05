@@ -24,7 +24,7 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
       Set tx=1,^Storm.Receipt(rid,"input")=pRequest.Payload,^Storm.Receipt(rid,"status")="PROCESSING"
       TCommit
       Set tx=0
-      Set state=##class(Storm.Worker).Call("/start",pRequest.Payload),steps=0
+      Set state=..CallWorker("/start",pRequest.Payload),steps=0
       While state.status="QUESTION" {
         Set steps=steps+1
         If steps>64 { Throw ##class(%Exception.General).%New("question bound exceeded") }
@@ -36,9 +36,15 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
         If reply.Status'="ANSWER" { Throw ##class(%Exception.General).%New("agent answer unknown") }
         Set value=##class(%DynamicObject).%FromJSON(reply.Payload)
         Set body={"token":(state.token),"question_id":(state.question.id),"answer":(value)}
-        Set state=##class(Storm.Worker).Call("/answer",body.%ToJSON())
+        Set state=..CallWorker("/answer",body.%ToJSON())
       }
       If state.status'="FINAL" { Throw ##class(%Exception.General).%New("worker result not final") }
+      // Best-effort similar-storm lookup (Embedded Python + VECTOR_COSINE); never blocks the receipt.
+      Set similar=""
+      Try {
+        Do ##class(Storm.Signature).EnsureSchema()
+        Set similar=##class(Storm.Signature).FindSimilar(rid,pRequest.Payload)
+      } Catch {}
       // One transaction: original alerts, root/child reasons and the final receipt.
       TStart
       Set tx=1
@@ -72,9 +78,17 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
         Set sc=##class(Ens.Alerting.ManagedAlert).UpdateManagedAlert(ids(group.root),1,,reason)
         If $$$ISERR(sc) { Throw ##class(%Exception.General).%New("AI evidence reason save failed") }
       }
+      If similar'="" {
+        Set group=state.groups.%Get(0)
+        Set reason="Storm "_rid_"; similar past storm="_similar
+        Set sc=##class(Ens.Alerting.ManagedAlert).UpdateManagedAlert(ids(group.root),1,,reason)
+        If $$$ISERR(sc) { Throw ##class(%Exception.General).%New("similar-storm reason save failed") }
+        Set ^Storm.Receipt(rid,"similar")=similar
+      }
       Set ^Storm.Receipt(rid,"result")=state.%ToJSON(),^Storm.Receipt(rid,"status")="FINAL"
       TCommit
       Set tx=0,pResponse.Status="FINAL",pResponse.Payload=state.%ToJSON()
+      Try { Do ##class(Storm.Signature).Record(rid,pRequest.Payload,state.%ToJSON()) } Catch {}
     }
   } Catch ex {
     If tx { TRollback 1 Set tx=0 }
@@ -83,6 +97,14 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
   }
   Lock -^Storm.Receipt(rid)
   Quit $$$OK
+}
+Method CallWorker(path As %String, body As %String) As %DynamicObject
+{
+  Set req=##class(Storm.WorkerRequest).%New(),req.Path=path,req.Body=body
+  Set sc=..SendRequestSync("Storm.WorkerOp",req,.reply,100)
+  If $$$ISERR(sc) { Throw ##class(%Exception.General).%New("worker transport failed") }
+  If '$IsObject(reply) { Throw ##class(%Exception.General).%New("no worker reply") }
+  Quit ##class(%DynamicObject).%FromJSON(reply.Body)
 }
 ClassMethod Reconcile(rid As %String) As %String
 {
