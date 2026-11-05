@@ -25,7 +25,7 @@ docker compose up -d --build     # IRIS + worker, healthy in about 15 s once the
 1. **Groups by topology.** A versioned graph of the Production joins alerts from different components that share an upstream path, and picks the upstream root.
 2. **Asks only when unsure.** A detector spots root conflicts and possible coincidences; `%AI.Agent` answers one yes/no question per conflict. Code checks every answer against the candidates and the exact partition.
 3. **Writes to the place on-call already looks.** All original alerts become `Ens.Alerting.ManagedAlert` records; the root alert carries the AI evidence as an action reason, and the receipt is written in the same transaction.
-4. **Traceable end to end.** Each storm is one Visual Trace session: Service → Process → Agent → Process → Service. The agent step shows the model, tool calls and duration.
+4. **Traceable end to end.** Each storm is one Visual Trace session: Service → Process → WorkerOp → Process, and Agent when the graph asks a question. The agent step shows the model, tool calls and duration.
 5. **Idempotent.** Resubmitting a storm ID returns the saved receipt with zero new alerts and zero new agent calls.
 
 ## Community Idea implemented
@@ -152,9 +152,8 @@ Interoperability Production, `%AI.Agent`, Visual Trace, Managed Alerts, transact
 | Bonus | Where judges can see it |
 |---|---|
 | **Custom Adapter (+2)** | `Storm.WorkerAdapter` (custom outbound) is the Production adapter on `Storm.WorkerOp`. Every `/start` and `/answer` call to the private worker goes through that adapter, so Visual Trace shows Service → Process → WorkerOp → Process. |
-| **Embedded Python (+3)** | `Storm.Signature.Embed` / `FindSimilar` are IRIS methods with `Language = python` and `import iris`. They turn the alert set into a signature and run the VECTOR SQL from inside IRIS. |
+| **Embedded Python (+3)** | `Storm.Signature.Embed` is an IRIS method with `Language = python` that turns the alert set into a 32-dim signature. `Storm.Signature.FindSimilar` is also `Language = python` and uses `import iris` to run the VECTOR SQL from inside IRIS. |
 | **IRIS Vector Search (+2)** | Table `Storm_Signature` stores each FINAL storm as `VECTOR(DOUBLE, 32)`. After the graph (and agent, when needed) settles a storm, `VECTOR_COSINE` finds the nearest past storm and the match is written onto the root Managed Alert as an action reason. |
-
 
 ## Troubleshooting
 
