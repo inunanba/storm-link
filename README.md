@@ -1,11 +1,14 @@
 # Storm Link
 
-Demo video: https://youtu.be/N950ADnIfTc
-
+## For judges: 2 minutes
 
 **They fix one failed message; we find the one cause behind the whole storm.**
 
 When one interface fails, every component downstream raises its own alert. Storm Link uses a versioned Production topology graph, folds the storm into one root cause on a native Managed Alert, and asks a small model only the yes/no questions the graph cannot settle.
+
+**1. Watch the demo video:** https://youtu.be/N950ADnIfTc
+
+**2. See the results.**
 
 | Storms solved exactly | Graph rule | Graph + AI |
 |---|---:|---:|
@@ -13,12 +16,23 @@ When one interface fails, every component downstream raises its own alert. Storm
 | Second set (15) | 6/15 | **11/15** |
 | Ambiguous storms, both sets (18) | 5/18 | **14/18** |
 
-On a fresh set of 15 new cases, graph + AI reached 11/15; across all 18 ambiguous storms it solved 14/18, compared with 5/18 for the graph rule.
+Adding the AI step raised the ambiguous storms solved from 5 to 14 out of 18, and graph + AI solved all 14 storms in the development set. On the second set of 15 new cases, graph + AI reached 11/15.
+
+**3. Run it in two commands** (after the one-time image load in [Quick start](#quick-start)):
 
 ```sh
 docker compose up -d --build     # IRIS + worker, healthy in about 15 s once the image is loaded
 ./scripts/demo.sh                # replay two storms + run all native tests
 ```
+
+The script folds two storms into their root causes and runs the native IRIS `%UnitTest` suite: 12 test methods and 72 assertions, all passing. Replay mode needs no API key and no model download.
+
+**4. Open the result where on-call already looks.**
+
+- **Managed Alerts** → alert 4: the root cause `DB.Out.EHR` for storm A1, with the AI evidence written as an action reason.
+- **Visual Trace** (link printed by the script): the whole storm as one session, Service → Process → WorkerOp → Process, and the Agent step with the model, tool calls and duration.
+
+In live mode, the Llama 3.2 3B model answered both yes/no questions for storm A1 and all three alerts landed under `DB.Out.EHR` ([live trace export](docs/trace-A1-C01-live.txt)). Full walkthrough: [Root cause in two minutes](#root-cause-in-two-minutes).
 
 ## What it does
 
