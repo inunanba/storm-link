@@ -19,9 +19,9 @@ echo "# source commit $(git rev-parse HEAD) (IRIS src baked into the image at bu
 for spec in after_commit:H12A after_send:H12B after_send:nosync:H12N; do
   point=${spec%:*}; r=${spec##*:}
   echo; echo "== stop point: $point  storm id: $r (H12 fixture, new id) =="
-  q "Kill ^Storm.Test(\"reached\",\"$r\") Set ^Storm.Test(\"crash\",\"$r\")=\"$point\" Write \"OUT|hook set\",!"
+  q "Kill ^IRIS.Temp.StormTest(\"reached\",\"$r\") Set ^IRIS.Temp.StormTest(\"crash\",\"$r\")=\"$point\" Write \"OUT|hook set\",!"
   q "Job ##class(Storm.WorkflowTests).SubmitJob(\"$r\",##class(Storm.WorkflowTests).Fixture(\"H12\",\"$r\"),1) Write \"OUT|submitted\",!"
-  for i in $(seq 1 120); do got=$(q "Write \"OUT|\",\$Get(^Storm.Test(\"reached\",\"$r\")),!"); [ "$got" != "OUT|" ] && break; sleep 1; done
+  for i in $(seq 1 120); do got=$(q "Write \"OUT|\",\$Get(^IRIS.Temp.StormTest(\"reached\",\"$r\")),!"); [ "$got" != "OUT|" ] && break; sleep 1; done
   echo "reached: ${got#OUT|}"
   echo -n "before kill:    "; q "Set r=\"$r\" $SNAP"
   pre=$(q "Set r=\"$r\" $H Write \"OUT|\",h,!"); pre=${pre#OUT|}
@@ -38,10 +38,12 @@ for spec in after_commit:H12A after_send:H12B after_send:nosync:H12N; do
   echo -n "final:          "; q "Set r=\"$r\" $SNAP"
 done
 echo; echo "== after the restarts: 14 normal fixtures (new ids *R) and 1 failure case (H12FR) =="
-q 'Set ok=0,t=0,m=0,list="A1,A2,A3,A4,A5,A6,C01,C02,C03,C04,C05,C06,C07,C08" For k=1:1:14 { Set c=$P(list,",",k),r=c_"R",sc=##class(Storm.Service).Submit(r,##class(Storm.WorkflowTests).Fixture(c,r),.o) Set:$$$ISOK(sc)&&(o.Status="FINAL") ok=ok+1 } Write "OUT|normal FINAL=",ok,"/14",!'
+q 'Set ok=0,t=0,m=0,list="A1,A2,A3,A4,A5,A6,C01,C02,C03,C04,C05,C06,C07,C08" For k=1:1:14 { Set c=$P(list,",",k),r=c_"R",sc=##class(Storm.Service).Submit(r,##class(Storm.WorkflowTests).Fixture(c,r),.o) Set:(sc=1)&&(o.Status="FINAL") ok=ok+1 } Write "OUT|normal FINAL=",ok,"/14",!'
 q 'Set r="H12FR",obj=##class(%DynamicObject).%FromJSON(##class(Storm.WorkflowTests).Fixture("H12",r)),a=obj.alerts.%Get(0),a.text=a.text_" resent",sc=##class(Storm.Service).Submit(r,obj.%ToJSON(),.o) Write "OUT|failure status=",o.Status," saved_result=",$D(^Storm.Receipt(r,"result")),!'
 drain
 q 'Set t=0,m=0,list="A1R,A2R,A3R,A4R,A5R,A6R,C01R,C02R,C03R,C04R,C05R,C06R,C07R,C08R,H12FR" For k=1:1:15 { Set r=$P(list,",",k),t=t+##class(Storm.Review).CountTasks(r),m=m+$D(^Storm.Receipt(r,"review")) } Write "OUT|tasks for normal+failure=",t," review_markers=",m,!'
 q 'Set x=##class(%SQL.Statement).%ExecDirect(,"SELECT %Subject s, COUNT(*) n FROM EnsLib_Workflow.TaskResponse GROUP BY %Subject ORDER BY %Subject") While x.%Next() { Write "OUT|all tasks: ",x.n,"x ",x.s,! }'
 q 'Set x=##class(%SQL.Statement).%ExecDirect(,"SELECT Type, ConfigName, COUNT(*) n FROM Ens_Util.Log WHERE Type IN (2,3) GROUP BY Type, ConfigName") While x.%Next() { Write "OUT|event log type=",$Case(x.Type,2:"Error",3:"Warning",:x.Type)," host=",x.ConfigName," count=",x.n,! }'
 q 'Set x=##class(%SQL.Statement).%ExecDirect(,"SELECT TOP 20 Type, ConfigName, Text FROM Ens_Util.Log WHERE Type = 2 ORDER BY ID") While x.%Next() { Write "OUT|error: ",x.ConfigName," ",$E(x.Text,1,160),! }'
+q 'Set x=##class(%SQL.Statement).%ExecDirect(,"SELECT COUNT(*) n FROM (SELECT TaskStatus_Request r FROM EnsLib_Workflow.TaskResponse GROUP BY TaskStatus_Request HAVING COUNT(*)>1)") Do x.%Next() Write "OUT|task requests with more than one task: ",x.n,!'
+q 'Set x=##class(%SQL.Statement).%ExecDirect(,"SELECT TOP 20 Text FROM Ens_Util.Log WHERE Type = 4 AND ConfigName = ? ORDER BY ID","Storm.Review") While x.%Next() { Write "OUT|Storm.Review info: ",$E(x.Text,1,160),! }'
