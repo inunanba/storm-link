@@ -58,7 +58,7 @@ In live mode, the Llama 3.2 3B model answered both yes/no questions for storm A1
 Storm Link uses Visual Trace as the trace for every LLM call in the storm production:
 
 1. **What we needed.** When the production asks the model a yes/no question, that call should appear in the same Visual Trace session as the storm, with the model name, token counts and how long it took — without a separate tracing service.
-2. **What we built.** Each storm is one Interoperability session: `Storm.Service` → `Storm.Process` → `Storm.Agent` and back. Every agent call is a stored message; the reply carries the model, token usage and duration.
+2. **What we built.** Each storm is one Interoperability session: `Storm.Service` → `Storm.Process` → `Storm.WorkerOp` → `Storm.Process`, and `Storm.Agent` only when the graph asks a question. Every agent call is a stored message; the reply carries the model, token usage and duration.
 3. **What you can see.** On storm A1 in live mode, Visual Trace shows both agent calls to `llama3.2-3b-ctx16k` (409 and 386 tokens, 10.9 s and 3.4 s). The same numbers are in the [live trace export](docs/trace-A1-C01-live.txt) and the screenshot below.
 
 ![Visual Trace of storm A1, live mode — Community Idea DPI-I-689](docs/img/visual-trace-A1-live.png)
