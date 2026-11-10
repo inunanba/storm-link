@@ -1,0 +1,39 @@
+# Gate-rejected review task: idempotent recovery (code at 845460c, evidence in this commit)
+# Isolated IRIS 2026.3 build 154 container, compose project stormwf. Run 2026-11-11 06:15-06:21 JST.
+
+What changed against a9ccda0
+- Storm.Process.RequestReview(rid) runs under the storm lock only while the stored marker is PENDING/SEND_FAILED.
+  Before sending it looks up an existing task for the stored storm id (Storm.Review.FindTask: persisted
+  TaskRequest first, then delivered TaskResponse, exact subject match on the storm id). Found -> marker REQUESTED, no send.
+- A resend of a FINAL storm returns the stored result unchanged and runs the same idempotent RequestReview,
+  so a stop between the FINAL commit and the task send is recovered by the next resend.
+- FINAL is answered only after the journal is flushed (SynchCommit is off by default; a kill a few seconds
+  after a commit could otherwise lose that commit).
+- Storm.ReviewOperation (subclass of EnsLib.Workflow.Operation, same config name/role Storm.Review): when Ens
+  redelivers the same TaskRequest after an unclean stop, the task already created for it is reused and only the
+  deferred-response token is re-bound. Without this the stock operation created a second task for one request
+  (observed in an earlier run: 2 TaskResponse rows for one TaskRequest).
+- init.script recovers a Troubled production after an unclean stop before starting it (before this the
+  container could not come back after a kill: STORM_START_FAILED).
+- Test-only stop hooks live in IRISTEMP (^IRIS.Temp.StormTest, not journaled, empty after restart).
+
+Required checks (Work, R-20261110-grokbot-work-stormlink-workflow-review-01) -> result
+- Stop after commit, before send; SIGKILL; restart; resend x3: PASS. tasks=1, reviewer inbox items=1, results byte-identical (sha256).
+- Stop after send accepted, before status update; SIGKILL; restart; resend x3: PASS. Existing task found (recovered=1), tasks=1, inbox=1, byte-identical.
+- Normal cases 14/14 FINAL with 0 tasks and 0 markers; failure case UNKNOWN, nothing saved, 0 tasks: PASS (in WorkflowTests and again after the restarts).
+- Real contention: Storm.Process pool 4 (test only, restored to 1), 4 simultaneous arrivals, lock contention observed 3 times, 1 task: PASS.
+Extra checks
+- Same "after send" point without journal flush (accepted send lost by the kill): resend creates the one task: PASS.
+- Stop inside the Workflow operation (task created, Ens message not completed): Ens redelivered the TaskRequest,
+  operation reused task 316 (Event Log info line), 1 task; reviewer then took ownership and chose Checked:
+  task complete, deferred response delivered (header Completed), stored result unchanged: PASS.
+- No TaskRequest has more than one task across the whole run.
+Suites on the same code: Storm.NativeTests 12/72, Storm.WorkflowTests 8/52, Python 18 tests/252 checks, review_gate_check 29 cases (H12 only).
+
+Recorded, not hidden
+- Event Log after the kills: "Error Recovering message N : OK" (Ens moving the killed in-flight Storm.Process
+  messages to suspended) and the suspended-message warnings. Those messages are not rerun; the resend path answers.
+- "No Return Queue - Unable to send deferred Response" warning once per completed task (fire-and-forget, no reply awaited).
+- Role membership routes the task to the reviewer; it is not described as an authorization barrier.
+- Shown through the task records and worklist via SQL/API, not with a screenshot of the reviewer's portal screen.
+- The online demo container does not include this; it is evidence from the isolated container only.

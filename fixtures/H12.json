@@ -1,0 +1,1 @@
+{"id":"H12","alerts":[{"id":"a0","c":"FTP.In.Claims","t":0,"text":"File claims_1102.x12 rejected: ISA segment length 105, expected 106"},{"id":"a1","c":"Claims.Process","t":2,"text":"Envelope validation failed for batch 1102"},{"id":"a2","c":"DB.Out.EHR","t":10,"text":"ERROR #6022: Gateway failed: network path not found"}]}

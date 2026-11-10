@@ -2,7 +2,12 @@ Set ^Storm.Ready=0
 Set ^Storm.Config("worker.host")="127.0.0.1"
 Set sc=$system.OBJ.LoadDir("/opt/storm/src","ck",.errors,1)
 If sc'=1 { Write "STORM_COMPILE_FAILED",! Do $SYSTEM.Process.Terminate($JOB,1) }
-Set sc=##class(Ens.Director).StartProduction("Storm.DemoProduction")
+Set sc=##class(Storm.Review).Setup()
+If sc'=1 { Write "STORM_REVIEW_SETUP_FAILED",! Do $SYSTEM.Process.Terminate($JOB,1) }
+// After an unclean stop the production can be left Troubled/Running in the saved state: recover, then start.
+Set st=##class(Ens.Director).GetProductionStatus(.pn,.ps) Write "STORM_PRODUCTION_STATE_BEFORE_START=",$Get(ps),!
+If $Get(ps)=1 { Set sc=1 } Else { If $Get(ps)'=2 { Write "STORM_RECOVER=",##class(Ens.Director).RecoverProduction(),! } Set sc=##class(Ens.Director).StartProduction("Storm.DemoProduction") }
+If sc'=1 { Write "STORM_START_ERROR=",$System.Status.GetErrorText(sc),! }
 If sc'=1 { Write "STORM_START_FAILED",! Do $SYSTEM.Process.Terminate($JOB,1) }
 Set ^Storm.Ready=1
 Write "STORM_SOURCE_LOADED_NATIVE_SMOKE_REQUIRED",!

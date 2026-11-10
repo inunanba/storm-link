@@ -7,14 +7,22 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
   Set rid=pRequest.StormId,allowed="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
   If ($Length(rid)<1)!($Length(rid)>64)!($Translate(rid,allowed)'="") Quit $$$ERROR($$$GeneralError,"invalid storm id")
   If $TLEVEL Quit $$$ERROR($$$GeneralError,"outer transaction not supported")
-  Lock +^Storm.Receipt(rid):5
-  If '$TEST Quit $$$ERROR($$$GeneralError,"storm in progress; reconcile")
+  Lock +^Storm.Receipt(rid):0
+  If '$TEST {
+    // Observed contention on the same storm id (counter only; the 5 s wait below is unchanged).
+    If $Increment(^Storm.Stat("lock_contended",rid))
+    Lock +^Storm.Receipt(rid):5
+    If '$TEST Quit $$$ERROR($$$GeneralError,"storm in progress; reconcile")
+  }
   Try {
     If $Data(^Storm.Receipt(rid,"input")) {
       If ^Storm.Receipt(rid,"input")'=pRequest.Payload {
         Set pResponse.Status="CONFLICT",pResponse.Payload="storm id bound to another input"
       } Else {
         Set pResponse.Status=^Storm.Receipt(rid,"status"),pResponse.Payload=$Get(^Storm.Receipt(rid,"result"),"reconcile; no rerun")
+        // Recovery after a stop between the FINAL commit and the review marker update: same stored result,
+        // and the review task is created only if no task for this storm id exists yet.
+        If pResponse.Status="FINAL" Do ..RequestReview(rid)
       }
     } Else {
       Set input=##class(%DynamicObject).%FromJSON(pRequest.Payload)
@@ -39,6 +47,9 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
         Set state=..CallWorker("/answer",body.%ToJSON())
       }
       If state.status'="FINAL" { Throw ##class(%Exception.General).%New("worker result not final") }
+      // Gate-rejected AI proposal: kept out of the decision/result contract, used only for a human review task.
+      Set review=""
+      If state.%IsDefined("review") { Set review=state.review Do state.%Remove("review") }
       // Best-effort similar-storm lookup (Embedded Python + VECTOR_COSINE); never blocks the receipt.
       Set similar=""
       Try {
@@ -85,9 +96,14 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
         If $$$ISERR(sc) { Throw ##class(%Exception.General).%New("similar-storm reason save failed") }
         Set ^Storm.Receipt(rid,"similar")=similar
       }
+      If $IsObject(review) { Set ^Storm.Receipt(rid,"review")="PENDING",^Storm.Receipt(rid,"review","detail")=review.%ToJSON() }
       Set ^Storm.Receipt(rid,"result")=state.%ToJSON(),^Storm.Receipt(rid,"status")="FINAL"
       TCommit
+      // SynchCommit is off by default: flush the journal so FINAL is answered only once the receipt is on disk.
+      Try { Do ##class(%SYS.Journal.System).Sync() } Catch {}
       Set tx=0,pResponse.Status="FINAL",pResponse.Payload=state.%ToJSON()
+      // Under the storm lock. Idempotent: looks up an existing task by the stored storm id before sending.
+      If $IsObject(review) Do ..RequestReview(rid)
       Try { Do ##class(Storm.Signature).Record(rid,pRequest.Payload,state.%ToJSON()) } Catch {}
     }
   } Catch ex {
@@ -97,6 +113,33 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
   }
   Lock -^Storm.Receipt(rid)
   Quit $$$OK
+}
+/// One native Workflow task (EnsLib.Workflow.Operation "Storm.Review"); fire-and-forget, no response is awaited,
+/// so the reviewer's decision never flows back into this storm's root cause. Never throws.
+/// Idempotent under the storm lock: runs only while the stored marker is PENDING/SEND_FAILED, and first looks up
+/// an existing task for the stored storm id (sent request or delivered task), so a restart after
+/// "commit, before send" creates the one task and a restart after "send accepted, before marker update" creates none.
+Method RequestReview(rid As %String)
+{
+  Try {
+    Set mark=$Get(^Storm.Receipt(rid,"review"))
+    If (mark'="PENDING")&&(mark'="SEND_FAILED") Quit
+    Do ##class(Storm.Review).CrashPoint(rid,"after_commit")
+    Set existing=##class(Storm.Review).FindTask(rid)
+    If existing'="" {
+      Set ^Storm.Receipt(rid,"review","task")=existing,^Storm.Receipt(rid,"review","recovered")=1
+      Set ^Storm.Receipt(rid,"review")="REQUESTED"
+      Quit
+    }
+    Set review=##class(%DynamicObject).%FromJSON(^Storm.Receipt(rid,"review","detail"))
+    Set task=##class(Storm.Review).BuildTask(rid,review)
+    Set sc=..SendRequestAsync(##class(Storm.Review).#ROLE,task,0,,"Storm "_rid_" human review")
+    If $$$ISOK(sc) Do ##class(Storm.Review).CrashPoint(rid,"after_send")
+    If $$$ISOK(sc) Set ^Storm.Receipt(rid,"review","task")=task.%Id()
+    Set ^Storm.Receipt(rid,"review")=$Select($$$ISOK(sc):"REQUESTED",1:"SEND_FAILED")
+  } Catch {
+    Set ^Storm.Receipt(rid,"review")="SEND_FAILED"
+  }
 }
 Method CallWorker(path As %String, body As %String) As %DynamicObject
 {
