@@ -1,3 +1,4 @@
+# NOTE: first candidate a9ccda0. Recovery/duplicate checks for the current code: docs/workflow-idempotency.txt, docs/workflow-crash-restart-run.txt
 # Storm Link human review via native IRIS Workflow - evidence dump
 # Branch boost-workflow-01, isolated compose project 'stormwf' (portal 127.0.0.1:52791), fresh container, run 2026-11-10 22:01 JST
 # $ZV: IRIS for UNIX (Ubuntu Server LTS for x86-64 Containers) 2026.3.0AI (Build 154U) Thu Sep 24 2026 10:04:49 EDT

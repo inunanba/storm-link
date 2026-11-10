@@ -1,0 +1,96 @@
+# 2026-11-11 06:18:13 JST project=stormwf container=stormwf-iris-1
+# image storm-wf:boost-workflow-01-idem sha256:aad1edb2a3f7661794a1e65c43366c1e18d8594eade2f2ada9fbae629ac62fe8
+# source commit 845460cb42b8af54025991a1f5a1cfc906a09214 (IRIS src baked into the image at build; tree clean for src/: 0 changes)
+
+== stop point: after_commit  storm id: H12A (H12 fixture, new id) ==
+OUT|hook set (H12A)
+OUT|submitted
+reached: after_commit tlevel=0 2026-11-10 21:18:13.682
+before kill:    OUT|status=FINAL review_marker=PENDING task_ref=(none) recovered=0 task_requests=0 tasks=0 reviewer_inbox_items=0 result_sha256=890e03ba75c97ed42c900cab1c7c7e46a572a41d9e0333dde16d6fd7da1cc493
+SIGKILL stormwf-iris-1 at 06:18:15
+restarted, healthy at 06:18:38; production: OUT|Storm.DemoProduction state=1
+after restart:  OUT|status=FINAL review_marker=PENDING task_ref=(none) recovered=0 task_requests=0 tasks=0 reviewer_inbox_items=0 result_sha256=890e03ba75c97ed42c900cab1c7c7e46a572a41d9e0333dde16d6fd7da1cc493
+resend 1: status=FINAL payload_sha256=890e03ba75c97ed42c900cab1c7c7e46a572a41d9e0333dde16d6fd7da1cc493 byte_identical_to_pre_kill=yes
+resend 2: status=FINAL payload_sha256=890e03ba75c97ed42c900cab1c7c7e46a572a41d9e0333dde16d6fd7da1cc493 byte_identical_to_pre_kill=yes
+resend 3: status=FINAL payload_sha256=890e03ba75c97ed42c900cab1c7c7e46a572a41d9e0333dde16d6fd7da1cc493 byte_identical_to_pre_kill=yes
+OUT|queue_drained=1
+final:          OUT|status=FINAL review_marker=REQUESTED task_ref=259 recovered=0 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=890e03ba75c97ed42c900cab1c7c7e46a572a41d9e0333dde16d6fd7da1cc493
+
+== stop point: after_send  storm id: H12B (H12 fixture, new id) ==
+OUT|hook set (H12B)
+OUT|submitted
+reached: after_send tlevel=0 2026-11-10 21:18:46.338
+before kill:    OUT|status=FINAL review_marker=PENDING task_ref=(none) recovered=0 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=1da2ec7fb5b7f5c098e8a18c687041302573d028bae1506033bb899e12294a98
+SIGKILL stormwf-iris-1 at 06:18:50
+restarted, healthy at 06:19:13; production: OUT|Storm.DemoProduction state=1
+after restart:  OUT|status=FINAL review_marker=PENDING task_ref=(none) recovered=0 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=1da2ec7fb5b7f5c098e8a18c687041302573d028bae1506033bb899e12294a98
+resend 1: status=FINAL payload_sha256=1da2ec7fb5b7f5c098e8a18c687041302573d028bae1506033bb899e12294a98 byte_identical_to_pre_kill=yes
+resend 2: status=FINAL payload_sha256=1da2ec7fb5b7f5c098e8a18c687041302573d028bae1506033bb899e12294a98 byte_identical_to_pre_kill=yes
+resend 3: status=FINAL payload_sha256=1da2ec7fb5b7f5c098e8a18c687041302573d028bae1506033bb899e12294a98 byte_identical_to_pre_kill=yes
+OUT|queue_drained=1
+final:          OUT|status=FINAL review_marker=REQUESTED task_ref=request:277 recovered=1 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=1da2ec7fb5b7f5c098e8a18c687041302573d028bae1506033bb899e12294a98
+
+== stop point: after_send:nosync  storm id: H12N (H12 fixture, new id) ==
+OUT|hook set (H12N)
+OUT|submitted
+reached: after_send:nosync tlevel=0 2026-11-10 21:19:21.081
+before kill:    OUT|status=FINAL review_marker=PENDING task_ref=(none) recovered=0 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=494452a36a968e8a3746123dee6cac576b74f3f574a5a799d147140828f55c9a
+SIGKILL stormwf-iris-1 at 06:19:25
+restarted, healthy at 06:19:48; production: OUT|Storm.DemoProduction state=1
+after restart:  OUT|status=FINAL review_marker=PENDING task_ref=(none) recovered=0 task_requests=0 tasks=0 reviewer_inbox_items=0 result_sha256=494452a36a968e8a3746123dee6cac576b74f3f574a5a799d147140828f55c9a
+resend 1: status=FINAL payload_sha256=494452a36a968e8a3746123dee6cac576b74f3f574a5a799d147140828f55c9a byte_identical_to_pre_kill=yes
+resend 2: status=FINAL payload_sha256=494452a36a968e8a3746123dee6cac576b74f3f574a5a799d147140828f55c9a byte_identical_to_pre_kill=yes
+resend 3: status=FINAL payload_sha256=494452a36a968e8a3746123dee6cac576b74f3f574a5a799d147140828f55c9a byte_identical_to_pre_kill=yes
+OUT|queue_drained=1
+final:          OUT|status=FINAL review_marker=REQUESTED task_ref=297 recovered=0 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=494452a36a968e8a3746123dee6cac576b74f3f574a5a799d147140828f55c9a
+
+== stop point: after_distribute  storm id: H12O (H12 fixture, new id) ==
+OUT|hook set (op)
+OUT|submitted
+reached: after_distribute tlevel=0 2026-11-10 21:19:56.452
+before kill:    OUT|status=FINAL review_marker=REQUESTED task_ref=315 recovered=0 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=02809c5628bbd9a4a517b95c86819557eb0171bbddc5fa71d4769ffaa25563bd
+SIGKILL stormwf-iris-1 at 06:20:01
+restarted, healthy at 06:20:23; production: OUT|Storm.DemoProduction state=1
+after restart:  OUT|status=FINAL review_marker=REQUESTED task_ref=315 recovered=0 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=02809c5628bbd9a4a517b95c86819557eb0171bbddc5fa71d4769ffaa25563bd
+resend 1: status=FINAL payload_sha256=02809c5628bbd9a4a517b95c86819557eb0171bbddc5fa71d4769ffaa25563bd byte_identical_to_pre_kill=yes
+resend 2: status=FINAL payload_sha256=02809c5628bbd9a4a517b95c86819557eb0171bbddc5fa71d4769ffaa25563bd byte_identical_to_pre_kill=yes
+resend 3: status=FINAL payload_sha256=02809c5628bbd9a4a517b95c86819557eb0171bbddc5fa71d4769ffaa25563bd byte_identical_to_pre_kill=yes
+OUT|queue_drained=1
+final:          OUT|status=FINAL review_marker=REQUESTED task_ref=315 recovered=0 task_requests=1 tasks=1 reviewer_inbox_items=1 result_sha256=02809c5628bbd9a4a517b95c86819557eb0171bbddc5fa71d4769ffaa25563bd
+
+== after the restarts: 14 normal fixtures (new ids *R) and 1 failure case (H12FR) ==
+OUT|normal FINAL=14/14
+OUT|failure status=UNKNOWN saved_result=0
+OUT|queue_drained=1
+OUT|tasks for normal+failure=0 review_markers=0
+OUT|all tasks: 1x STORM H12: AI ROOT-CAUSE PROPOSAL REJECTED BY GATE - HUMAN CHECK
+OUT|all tasks: 1x STORM H12A: AI ROOT-CAUSE PROPOSAL REJECTED BY GATE - HUMAN CHECK
+OUT|all tasks: 1x STORM H12B: AI ROOT-CAUSE PROPOSAL REJECTED BY GATE - HUMAN CHECK
+OUT|all tasks: 1x STORM H12C: AI ROOT-CAUSE PROPOSAL REJECTED BY GATE - HUMAN CHECK
+OUT|all tasks: 1x STORM H12N: AI ROOT-CAUSE PROPOSAL REJECTED BY GATE - HUMAN CHECK
+OUT|all tasks: 1x STORM H12O: AI ROOT-CAUSE PROPOSAL REJECTED BY GATE - HUMAN CHECK
+OUT|all tasks: 1x STORM H12P: AI ROOT-CAUSE PROPOSAL REJECTED BY GATE - HUMAN CHECK
+OUT|event log type=Error host= count=5
+OUT|event log type=Warning host= count=6
+OUT|error:  Error Recovering message 245 : OK
+OUT|error:  Error Recovering message 264 : OK
+OUT|error:  Error Recovering message 275 : OK
+OUT|error:  Error Recovering message 283 : OK
+OUT|error:  Error Recovering message 313 : OK
+OUT|task requests with more than one task: 0
+OUT|Storm.Review info: ConfigItem 'Storm.Review' (Storm.ReviewOperation) started in job 692
+OUT|Storm.Review info: ConfigItem 'Storm.Review' (Storm.ReviewOperation) started in job 707
+OUT|Storm.Review info: ConfigItem 'Storm.Review' (Storm.ReviewOperation) started in job 711
+OUT|Storm.Review info: ConfigItem 'Storm.Review' (Storm.ReviewOperation) started in job 711
+OUT|Storm.Review info: ConfigItem 'Storm.Review' (Storm.ReviewOperation) started in job 711
+OUT|Storm.Review info: Task request 315 redelivered; reusing existing task 316 (no second task)
+
+== reviewer acts on the task that was reused after TaskRequest redelivery (H12O), same container ==
+OUT|take ownership item=316||stormreviewer sc=1
+OUT|ProcessAction Checked sc=1
+OUT|task 316 complete=1 action=Checked assigned=stormreviewer
+OUT|stored result unchanged=1 receipt status=FINAL tasks=1
+OUT|task request header status=9
+OUT|last log t=3 No Return Queue - Unable to send deferred Response to Request 313
+OUT|last log t=4 Task request 315 redelivered; reusing existing task 316 (no second task)
+OUT|last log t=4 Production 'Storm.DemoProduction' is up-to-date.
