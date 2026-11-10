@@ -11,18 +11,21 @@ Parameter ROLE = "Storm.Review";
 /// The single Workflow user allowed in the role.
 Parameter REVIEWER = "stormreviewer";
 
-/// Creates the role and its one member (idempotent). AutoCreateRole is off on the operation.
-ClassMethod Setup() As %Status
+/// Admin setup step (idempotent): creates the Workflow role and puts one reviewer in it.
+/// reviewer = the IRIS user name of the person who should get the review tasks (Workflow user record only;
+/// no IRIS login, password or privilege is created here). AutoCreateRole is off on the operation.
+/// The Docker sample (init.script) calls it with the default name; an IPM install runs it once by hand.
+ClassMethod Setup(reviewer As %String = {..#REVIEWER}) As %Status
 {
   Set sc=$$$OK
   If '##class(EnsLib.Workflow.RoleDefinition).%ExistsId(..#ROLE) {
     Set sc=##class(EnsLib.Workflow.RoleDefinition).CreateRole(..#ROLE) Quit:$$$ISERR(sc) sc
   }
-  If '##class(EnsLib.Workflow.UserDefinition).%ExistsId(..#REVIEWER) {
-    Set sc=##class(EnsLib.Workflow.UserDefinition).CreateUser(..#REVIEWER,"Storm Link reviewer") Quit:$$$ISERR(sc) sc
+  If '##class(EnsLib.Workflow.UserDefinition).%ExistsId(reviewer) {
+    Set sc=##class(EnsLib.Workflow.UserDefinition).CreateUser(reviewer,"Storm Link reviewer") Quit:$$$ISERR(sc) sc
   }
-  If '##class(EnsLib.Workflow.RoleMembership).%ExistsId(..#ROLE_"||"_..#REVIEWER) {
-    Set sc=##class(EnsLib.Workflow.RoleDefinition).AddUserToRole(..#ROLE,..#REVIEWER,1,"Reviewer")
+  If '##class(EnsLib.Workflow.RoleMembership).%ExistsId(..#ROLE_"||"_reviewer) {
+    Set sc=##class(EnsLib.Workflow.RoleDefinition).AddUserToRole(..#ROLE,reviewer,1,"Reviewer")
   }
   Quit sc
 }

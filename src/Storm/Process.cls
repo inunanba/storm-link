@@ -125,6 +125,13 @@ Method RequestReview(rid As %String)
     Set mark=$Get(^Storm.Receipt(rid,"review"))
     If (mark'="PENDING")&&(mark'="SEND_FAILED") Quit
     Do ##class(Storm.Review).CrashPoint(rid,"after_commit")
+    // Setup not run yet (e.g. right after an IPM install): keep the task pending instead of losing it.
+    // SEND_FAILED is retried by the next resend of this storm once the role exists.
+    If '##class(EnsLib.Workflow.RoleDefinition).%ExistsId(##class(Storm.Review).#ROLE) {
+      Set ^Storm.Receipt(rid,"review")="SEND_FAILED"
+      Do ##class(Ens.Util.Log).LogWarning($classname(),"RequestReview","Storm "_rid_": review role Storm.Review not set up; run Do ##class(Storm.Review).Setup(""<reviewer>""), then resend this storm")
+      Quit
+    }
     Set existing=##class(Storm.Review).FindTask(rid)
     If existing'="" {
       Set ^Storm.Receipt(rid,"review","task")=existing,^Storm.Receipt(rid,"review","recovered")=1

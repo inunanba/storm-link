@@ -174,4 +174,28 @@ ClassMethod SetProcessPool(size As %Integer)
   Do ##class(Ens.Director).UpdateProduction(30)
 }
 
+/// IPM install before the admin setup step: the role does not exist yet. The task is kept pending (SEND_FAILED,
+/// nothing lost, no error task), and the first resend after Storm.Review.Setup() creates exactly one task.
+Method Test9RoleMissingThenSetup()
+{
+  Set rid="H12S",payload=..Fixture("H12",rid)
+  Do ##class(EnsLib.Workflow.RoleDefinition).RemoveUserFromRole("Storm.Review","stormreviewer")
+  Do ##class(EnsLib.Workflow.RoleDefinition).%DeleteId("Storm.Review")
+  Do $$$AssertEquals(##class(EnsLib.Workflow.RoleDefinition).%ExistsId("Storm.Review"),0,"role removed for this test")
+  Set sc=##class(Storm.Service).Submit(rid,payload,.out),before=$Get(^Storm.Receipt(rid,"result"))
+  Do $$$AssertEquals(out.Status,"FINAL","storm still FINAL without the role")
+  Do $$$AssertEquals($Get(^Storm.Receipt(rid,"review")),"SEND_FAILED","review kept pending, not marked sent")
+  Do $$$AssertTrue(##class(Storm.Review).WaitQueue(),"workflow queue drained")
+  Do $$$AssertEquals(##class(Storm.Review).CountTasks(rid),0,"no task while the role is missing")
+  Do $$$AssertEquals(##class(Storm.Review).Setup(),1,"admin setup step")
+  Set sc=##class(Storm.Service).Submit(rid,payload,.again)
+  Do $$$AssertEquals(again.Payload,before,"resend returns the saved result unchanged")
+  Do $$$AssertTrue(##class(Storm.Review).WaitQueue(),"workflow queue drained")
+  Do $$$AssertEquals(##class(Storm.Review).CountTasks(rid),1,"one task after setup and resend")
+  Do $$$AssertEquals(^Storm.Receipt(rid,"review"),"REQUESTED","review marked requested")
+  Set sc=##class(Storm.Service).Submit(rid,payload,.again)
+  Do $$$AssertTrue(##class(Storm.Review).WaitQueue(),"workflow queue drained")
+  Do $$$AssertEquals(##class(Storm.Review).CountTasks(rid),1,"still one task after another resend")
+}
+
 }

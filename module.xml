@@ -12,6 +12,9 @@
       <Resource Name="Storm.PKG"/>
       <FileCopy Name="worker.py" Target="${mgrdir}storm-link/worker.py"/>
       <FileCopy Name="fixtures/" Target="${mgrdir}storm-link/fixtures/"/>
+      <FileCopy Name="bench/" Target="${mgrdir}storm-link/bench/"/>
+      <FileCopy Name="recordings/ai_v2_dev.json" Target="${mgrdir}storm-link/recordings/ai_v2_dev.json"/>
+      <FileCopy Name="recordings/ai_v2_heldout.json" Target="${mgrdir}storm-link/recordings/ai_v2_heldout.json"/>
     </Module>
   </Document>
 </Export>
