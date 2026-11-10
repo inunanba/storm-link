@@ -10,7 +10,7 @@
 
 In the online demo, open [Managed Alerts](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.ManagedAlertViewer.zen) → alert 4 → Action 4 → Reason. Storm Link identified `DB.Out.EHR` as storm A1's root cause; the recorded explanation cites error #6022 from `SQLServer.EHR`. The same storm as one session: [Visual Trace, session 6](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=6) ([screenshot](docs/img/live-demo-A1-visual-trace.png)). Full-window view of the alert: [screenshot](docs/img/live-demo-A1-managed-alert-full.png).
 
-When one interface fails, every component downstream raises its own alert. Storm Link uses a versioned Production topology graph, folds the storm into one root cause on a native Managed Alert, and asks a small model only the yes/no questions the graph cannot settle.
+When one interface fails, every component downstream raises its own alert. Storm Link uses a versioned Production topology graph, folds the storm into one root cause on a native Managed Alert, and lets an IRIS AI Hub agent answer the yes/no questions the graph cannot settle.
 
 Evidence at a glance: the [live-mode trace of storm A1](docs/trace-A1-C01-live.txt) (Llama 3.2 3B answered both yes/no questions) and the [root Managed Alert](docs/img/managed-alert-A1-root.png) with the AI evidence written as an action reason. Submitting the same storm ID again returns the saved receipt.
 
@@ -45,11 +45,11 @@ In live mode, the Llama 3.2 3B model answered both yes/no questions for storm A1
 ## What it does
 
 1. **Groups by topology.** A versioned graph of the Production joins alerts from different components that share an upstream path, and picks the upstream root.
-2. **Asks only when unsure.** A detector spots root conflicts and possible coincidences; `%AI.Agent` answers one yes/no question per conflict. Code checks every answer against the candidates and the exact partition.
+2. **AI Hub decisions, with a traceable path to action.** A detector spots root conflicts and possible coincidences, and an IRIS AI Hub agent (`%AI.Agent`) answers one yes/no question per conflict. Storm Link assembles the result against its candidate and grouping rules; IRIS traces the agent steps in Visual Trace and records the result on Managed Alerts.
 3. **Writes to the place on-call already looks.** All original alerts become `Ens.Alerting.ManagedAlert` records; the root alert carries the AI evidence as an action reason, and the receipt is written in the same transaction.
 4. **Traceable end to end.** Each storm is one Visual Trace session: Service → Process → WorkerOp → Process, and Agent when the graph asks a question. The agent step shows the model, tool calls and duration.
 5. **Idempotent.** Resubmitting a storm ID returns the saved receipt with zero new alerts and zero new agent calls.
-6. **A person checks what the gate rejected.** When the gate rejects an AI proposal, Storm Link creates a review task for a person through native IRIS Workflow. The reviewer's action does not change the stored root cause or grouping. In an isolated environment, resending the same storm after IRIS was stopped and restarted still gave one review task ([restart evidence](docs/workflow-idempotency.txt), [fresh IPM install run](docs/ipm-1.0.4-fresh-install.txt)). Not part of the online replay demo.
+6. **AI proposals reach a teammate through IRIS Workflow.** IRIS Workflow brings AI proposals selected by Storm Link's grouping-rule checks to a teammate's inbox. The teammate can inspect the evidence and record Checked or NeedsEngineer, while the saved root cause and grouping stay unchanged. In a stop/restart-then-resend test, there was 1 Workflow task ([restart evidence](docs/workflow-idempotency.txt), [fresh IPM install run](docs/ipm-1.0.4-fresh-install.txt)). Try Workflow after an IPM install with the administrator steps in [Quick start](#quick-start); the browser demo shows A1's Managed Alert and Visual Trace.
 
 ## Community Idea implemented
 
