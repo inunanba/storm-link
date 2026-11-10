@@ -4,7 +4,11 @@
 
 **Find the one root cause behind an IRIS alert storm, with the evidence on the root Managed Alert.**
 
-**Try it live (read-only):** https://nemesis-evoke-guidance.ngrok-free.dev/ — click Visit Site on the ngrok notice, then sign in as `viewer` / `StormLink-Viewer-2026`.
+**Try it live:** https://nemesis-evoke-guidance.ngrok-free.dev/ — a running, read-only IRIS demo that replays recorded AI answers. Click Visit Site on the ngrok notice, then sign in as `viewer` / `StormLink-Viewer-2026`.
+
+[![Storm A1 in the live demo: Managed Alert 4, root cause DB.Out.EHR, with the AI evidence as the action reason](docs/img/live-demo-A1-managed-alert.png)](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.ManagedAlertViewer.zen)
+
+In the live demo, [Managed Alerts](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.ManagedAlertViewer.zen) → alert 4 is storm A1's root cause `DB.Out.EHR`. Open Action 4 to read the evidence: both alerts report error #6022 from `SQLServer.EHR`, so they share one cause. The same storm as one session: [Visual Trace, session 6](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=6) ([screenshot](docs/img/live-demo-A1-visual-trace.png)).
 
 When one interface fails, every component downstream raises its own alert. Storm Link uses a versioned Production topology graph, folds the storm into one root cause on a native Managed Alert, and asks a small model only the yes/no questions the graph cannot settle.
 
