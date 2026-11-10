@@ -2,7 +2,9 @@
 
 ## For judges: 2 minutes
 
-**They fix one failed message; we find the one cause behind the whole storm.**
+**Find the cause behind a storm of IRIS alerts, and see the evidence on the root Managed Alert.**
+
+Start with [A1's recorded live trace](docs/trace-A1-C01-live.txt) and the [root Managed Alert](docs/img/managed-alert-A1-root.png). This is a retained live example, not a fresh model call. For a key-free local run, use replay after loading the required EAP image. Replaying the same storm ID returns the existing receipt.
 
 When one interface fails, every component downstream raises its own alert. Storm Link uses a versioned Production topology graph, folds the storm into one root cause on a native Managed Alert, and asks a small model only the yes/no questions the graph cannot settle.
 
