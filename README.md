@@ -2,13 +2,13 @@
 
 ## For judges: 2 minutes
 
-**Find the cause behind a storm of IRIS alerts, and see the evidence on the root Managed Alert.**
+**Find the one root cause behind an IRIS alert storm, with the evidence on the root Managed Alert.**
 
-Start with [A1's recorded live trace](docs/trace-A1-C01-live.txt) and the [root Managed Alert](docs/img/managed-alert-A1-root.png). This is a retained live example, not a fresh model call. For a key-free local run, use replay after loading the required EAP image. Replaying the same storm ID returns the existing receipt.
+**Try it live (read-only):** https://nemesis-evoke-guidance.ngrok-free.dev/ — click Visit Site on the ngrok notice, then sign in as `viewer` / `StormLink-Viewer-2026`.
 
 When one interface fails, every component downstream raises its own alert. Storm Link uses a versioned Production topology graph, folds the storm into one root cause on a native Managed Alert, and asks a small model only the yes/no questions the graph cannot settle.
 
-**Try it live (read-only):** https://nemesis-evoke-guidance.ngrok-free.dev/ — click Visit Site on the ngrok notice, then sign in as `viewer` / `StormLink-Viewer-2026`.
+Evidence at a glance: the [live-mode trace of storm A1](docs/trace-A1-C01-live.txt) (Llama 3.2 3B answered both yes/no questions) and the [root Managed Alert](docs/img/managed-alert-A1-root.png) with the AI evidence written as an action reason. Submitting the same storm ID again returns the saved receipt.
 
 **1. Watch the demo video:** https://youtu.be/N950ADnIfTc (MP4 download, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4))
 
@@ -22,7 +22,7 @@ When one interface fails, every component downstream raises its own alert. Storm
 
 Adding the AI step raised the ambiguous storms solved from 5 to 14 out of 18, and graph + AI solved all 14 storms in the development set. On the second set of 15 new cases, graph + AI reached 11/15.
 
-**3. Run it in two commands** (after the one-time image load in [Quick start](#quick-start)):
+**3. Run it locally in two commands** (after loading the InterSystems IRIS 2026.3 AI Hub Community image, build 154, once — see [Quick start](#quick-start)):
 
 ```sh
 docker compose up -d --build     # IRIS + worker, healthy in about 15 s once the image is loaded
@@ -154,12 +154,12 @@ docker compose exec -T iris iris session IRIS -U USER < scripts/runtests.script
 python3 bench/run_bench2.py --set both
 ```
 
-| Set | Exact-match | Normalized text | Graph rule | Graph + AI |
-|---|---:|---:|---:|---:|
-| Development (14) | 2/14 | 4/14 | 10/14 | **14/14** |
-| Second set (15) | 2/15 | 3/15 | 6/15 | **11/15** |
+| Set | Exact-match | Normalized text | Same component, 60 s window | Graph rule | Graph + AI |
+|---|---:|---:|---:|---:|---:|
+| Development (14) | 2/14 | 4/14 | 3/14 | 10/14 | **14/14** |
+| Second set (15) | 2/15 | 3/15 | 3/15 | 6/15 | **11/15** |
 
-Runs in plain Python with saved model answers, no key and no network. Per-case output: [benchmark-replay.txt](docs/benchmark-replay.txt).
+Runs in plain Python with saved model answers, no key and no network. Per-case output: [benchmark-replay.txt](docs/benchmark-replay.txt). The same-component 60 s window column, a common alert-grouping baseline scored with the same exact root-and-members rule, comes from `python3 bench/boost_compare.py`.
 
 ## Native IRIS features
 
