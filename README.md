@@ -189,7 +189,7 @@ Every bonus this entry claims, with the place to check it:
 | Article (EN) | [English article on the InterSystems Developer Community](https://community.intersystems.com/post/storm-link-finding-one-cause-behind-alert-storm-inside-intersystems-iris) |
 | Article translation (JA) | [Japanese article on the Japanese Developer Community](https://jp.community.intersystems.com/node/590748) |
 | Docker | `docker compose up -d --build` — see [Quick start](#quick-start) |
-| IPM | package `storm-link` 1.0.1, `zpm "install storm-link"`; `module.xml` at the repo root |
+| IPM | package `storm-link` 1.0.4, `zpm "install storm-link"`; `module.xml` at the repo root |
 | Embedded Python | `Storm.Signature.Embed` and `Storm.Signature.FindSimilar` (`Language = python`) — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
 | IRIS Vector Search | `Storm_Signature` table with `VECTOR(DOUBLE, 32)` and `VECTOR_COSINE` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
 | Custom Adapter | `Storm.WorkerAdapter` on `Storm.WorkerOp` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
