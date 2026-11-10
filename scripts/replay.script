@@ -1,2 +1,3 @@
 For cid="C01","A1" { Set f=##class(%Stream.FileCharacter).%New(),sc=f.LinkToFile("/opt/storm/fixtures/"_cid_".json"),p=f.Read(32767) Set n0=$Get(^Ens.Alerting.ManagedAlertD) Set sc=##class(Storm.Service).Submit(cid,p,.out) Write "CASE=",cid," SC=",sc," STATUS=",out.Status," ALERTS_NEW=",$Get(^Ens.Alerting.ManagedAlertD)-n0,!,"PAYLOAD=",$E(out.Payload,1,400),! }
+Set x=##class(%SQL.Statement).%ExecDirect(,"SELECT TOP 1 h.SessionId AS s FROM Ens.MessageHeader h JOIN Storm.Message m ON m.ID=h.MessageBodyId WHERE h.MessageBodyClassName='Storm.Message' AND h.SourceConfigName='Storm.Service' AND m.StormId='A1' ORDER BY h.ID") Write:x.%Next() "A1_SESSION=",x.s,!
 Halt
