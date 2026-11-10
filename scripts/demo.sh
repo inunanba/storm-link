@@ -10,7 +10,9 @@ for _ in $(seq 60); do
 done
 docker compose ps iris | grep -q '(healthy)' || { echo "IRIS not healthy; see Troubleshooting in README"; exit 1; }
 echo "== Replay C01 (clear storm) and A1 (ambiguous storm) =="
-docker compose exec -T iris iris session IRIS -U USER < scripts/replay.script | grep -aE '^(CASE|PAYLOAD)='
+replay=$(docker compose exec -T iris iris session IRIS -U USER < scripts/replay.script)
+echo "$replay" | grep -aE '^(CASE|PAYLOAD)='
+sid=$(echo "$replay" | grep -ao 'A1_SESSION=[0-9]*' | head -1 | cut -d= -f2)
 echo "== Native tests =="
 docker compose exec -T iris iris session IRIS -U USER < scripts/runtests.script | tee /tmp/storm-native-tests.log | grep -aE '^(All PASSED:|FAILED)'
-echo "Portal: http://${STORM_PORTAL_BIND:-127.0.0.1:52774}/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=5"
+echo "Portal: http://${STORM_PORTAL_BIND:-127.0.0.1:52774}/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=${sid:-1}"

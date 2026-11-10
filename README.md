@@ -80,7 +80,7 @@ IPM: the package is `storm-link` (module.xml at the repo root). On an IRIS 2026.
 | Destination | Address |
 |---|---|
 | Management Portal | http://127.0.0.1:52774/csp/sys/UtilHome.csp |
-| Visual Trace of storm A1 | http://127.0.0.1:52774/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=5 |
+| Visual Trace of storm A1 | printed by `./scripts/demo.sh` (`SESSIONID=6` on a fresh stack) |
 | Managed Alerts | http://127.0.0.1:52774/csp/user/EnsPortal.ManagedAlertViewer.zen |
 | Worker | private, inside the IRIS network namespace; no host port |
 
@@ -108,7 +108,7 @@ CASE=C01 SC=1 STATUS=FINAL ALERTS_NEW=3
 CASE=A1 SC=1 STATUS=FINAL ALERTS_NEW=3
 == Native tests ==
 All PASSED: methods=12 assertions_passed=72 assertions_failed=0
-Portal: http://127.0.0.1:52774/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=5
+Portal: http://127.0.0.1:52774/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=6
 ```
 
 1. **C01** is a clear storm: three queue alerts on one router fold into one group with no AI call.
