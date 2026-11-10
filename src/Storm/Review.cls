@@ -73,15 +73,20 @@ ClassMethod FindTask(rid As %String) As %String
 }
 
 /// Test-only stop point. Inactive unless ^Storm.Test("crash",rid) names this point (set only by the crash test).
-/// One-shot: the hook is cleared and the arrival is recorded in a committed transaction (journal synced),
+/// One-shot: the hook is cleared and the arrival is recorded in a committed transaction,
 /// then the job waits so the test can kill the whole IRIS container at exactly this point.
+/// Hook value "<point>" also flushes the journal (everything done up to the point is on disk);
+/// "<point>:nosync" does not (an unflushed tail may be lost by the kill).
 ClassMethod CrashPoint(rid As %String, point As %String)
 {
-  Quit:$Get(^Storm.Test("crash",rid))'=point
+  Set hook=$Get(^Storm.Test("crash",rid))
+  Quit:$Piece(hook,":")'=point
+  Set tl=$TLEVEL
   TStart
   Kill ^Storm.Test("crash",rid)
-  Set ^Storm.Test("reached",rid)=point_" "_$ZDT($ZTS,3,,3)
+  Set ^Storm.Test("reached",rid)=hook_" tlevel_at_entry="_tl_" "_$ZDT($ZTS,3,,3)
   TCommit
+  If hook'[":nosync" Do ##class(%SYS.Journal.System).Sync()
   Hang 120
 }
 

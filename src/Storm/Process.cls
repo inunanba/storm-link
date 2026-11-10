@@ -99,6 +99,8 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
       If $IsObject(review) { Set ^Storm.Receipt(rid,"review")="PENDING",^Storm.Receipt(rid,"review","detail")=review.%ToJSON() }
       Set ^Storm.Receipt(rid,"result")=state.%ToJSON(),^Storm.Receipt(rid,"status")="FINAL"
       TCommit
+      // SynchCommit is off by default: flush the journal so FINAL is answered only once the receipt is on disk.
+      Try { Do ##class(%SYS.Journal.System).Sync() } Catch {}
       Set tx=0,pResponse.Status="FINAL",pResponse.Payload=state.%ToJSON()
       // Under the storm lock. Idempotent: looks up an existing task by the stored storm id before sending.
       If $IsObject(review) Do ..RequestReview(rid)
