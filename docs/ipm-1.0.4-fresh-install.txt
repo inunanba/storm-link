@@ -1,0 +1,58 @@
+# Storm Link 1.0.4: fresh IPM install and review-task check (isolated sample environment)
+# Run 2026-11-11 07:11-07:16 JST. New empty container from iris-ai-hub:local154 (IRIS 2026.3 AI Hub build 154),
+# portal on 127.0.0.1 only, not the compose init.script, not the online demo.
+# Package: storm-link-1.0.4.tgz built with `zpm "storm-link package"` from commit 2455c9aea9e16e4537464fbf2a541839a32a9c51
+#   sha256 8f61117caac19a4b002106f7215e8522ed033a93711ebd68be6b6275266e2eff, module.xml Version 1.0.4
+# IPM: zpm-0.10.10.xml, enabled for USER with `zpm "enable -map -globally"` in %SYS.
+
+== before install (USER) ==
+Storm classes=0  Workflow roles=0  receipts=0
+
+== zpm "load /pkg/storm-link-1.0.4.tgz" (USER) ==
+[USER|storm-link] Initialize SUCCESS / Reload SUCCESS (/usr/irissys/ipm/storm-link/1.0.4/) / Validate SUCCESS
+[USER|storm-link] Compile SUCCESS / Configure SUCCESS / Activate SUCCESS
+storm-link 1.0.4
+<mgr dir>/storm-link/: bench  fixtures  recordings  worker.py
+
+== admin steps (README, "IPM") ==
+^Storm.Config("worker.host")="127.0.0.1"; worker started: cd /usr/irissys/mgr/storm-link && STORM_MODE=replay python3 -B worker.py
+
+== storm H12 (gate rejects the AI proposal) ==
+role before setup=0
+StartProduction=1
+1st submit (before setup): status=FINAL marker=SEND_FAILED tasks=0
+warning: Storm H12: review role Storm.Review not set up; run Do ##class(Storm.Review).Setup("<reviewer>"), then resend this storm
+event log errors=0
+admin step Do ##class(Storm.Review).Setup("stormreviewer")=1
+resend 1: status=FINAL result_identical=1 marker=REQUESTED tasks=1
+resend 2: status=FINAL result_identical=1 marker=REQUESTED tasks=1
+resend 3: status=FINAL result_identical=1 marker=REQUESTED tasks=1
+worklist item 16||stormreviewer user=stormreviewer
+all tasks in namespace=1
+
+== reviewer and outsider (User Portal Workflow inbox, /csp/user/_DeepSee.UserPortal.Workflow.zen) ==
+Sample-only IRIS logins in this container: stormreviewer (Workflow member of Storm.Review) and stormoutsider
+(Workflow user, not a member). Both with roles %EnsRole_Operator and %DeepSee_Portal; Analytics enabled for /csp/user.
+Random passwords, never written to the repo or the screenshots. Container deleted after the run.
+reviewer inbox: 1 task "Storm H12: AI root-cause proposal rejected by gate - human check"   (img/workflow-inbox-reviewer.png)
+outsider inbox, same moment: "You have no workflow tasks"                                     (img/workflow-inbox-outsider.png)
+
+== before Checked ==
+stored_result_sha256=1d50e594004bc2f7dd738f5ae593721234bfd81d7b4fe61fea2ef02091849de1 len=851 marker=REQUESTED
+task 16 status=Unassigned action= owner=
+worklist items=1
+outsider worklist items=0
+
+== reviewer: Accept, then Checked in the inbox (img/workflow-task-reviewer.png, img/workflow-inbox-reviewer-after-checked.png) ==
+stored_result_sha256=1d50e594004bc2f7dd738f5ae593721234bfd81d7b4fe61fea2ef02091849de1 len=851 marker=REQUESTED
+task 16 status=Completed action=Checked owner=stormreviewer
+worklist items=0
+outsider worklist items=0
+resend after Checked: status=FINAL result_identical=1 marker=REQUESTED tasks=1
+stored_result_sha256=1d50e594004bc2f7dd738f5ae593721234bfd81d7b4fe61fea2ef02091849de1 len=851 marker=REQUESTED
+task 16 status=Completed action=Checked owner=stormreviewer
+worklist items=0
+outsider worklist items=0
+
+Result: one task for the reviewer only; resends before and after Checked kept one task; Checked completed the task
+and the stored result (sha256 1d50e594...) stayed byte-identical; the outsider saw no task.

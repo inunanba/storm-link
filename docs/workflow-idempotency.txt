@@ -37,3 +37,7 @@ Recorded, not hidden
 - Role membership routes the task to the reviewer; it is not described as an authorization barrier.
 - Shown through the task records and worklist via SQL/API, not with a screenshot of the reviewer's portal screen.
 - The online demo container does not include this; it is evidence from the isolated container only.
+
+Re-run on the 1.0.4 candidate (2026-11-11 07:11-07:13 JST, source 2455c9a): all four stop points again ended with
+one task per storm and byte-identical resends: docs/workflow-crash-restart-run.txt.
+Fresh IPM install of the 1.0.4 package with reviewer and outsider inboxes: docs/ipm-1.0.4-fresh-install.txt.

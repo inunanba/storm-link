@@ -1,8 +1,14 @@
-# Storm.WorkflowTests + regressions, one fresh isolated container (compose project stormwf, portal 127.0.0.1:52791)
-# Source commit 845460cb42b8af54025991a1f5a1cfc906a09214 (IRIS src baked into image sha256:aad1edb2a3f7661794a1e65c43366c1e18d8594eade2f2ada9fbae629ac62fe8 at build), run 2026-11-11 06:18 JST
-# $ZV: IRIS for UNIX (Ubuntu Server LTS for x86-64 Containers) 2026.3.0AI (Build 154U) Thu Sep 24 2026 10:04:49 EDT
-# Order in that container: Storm.NativeTests, Storm.WorkflowTests, then tests/crash_restart_check.sh (docs/workflow-crash-restart-run.txt)
+# Storm.WorkflowTests: Storm.Tests.RunTests("Storm.WorkflowTests")
+# isolated container stormwf-iris-1 (node 7acf7de8e49d), image storm-wf:release-104-ship-ipm sha256:ab14fca0adf92da5dbd2262f8c3875eb53b3631cd2f26070f2ee56b2fa8162bb, source commit 2455c9aea9e16e4537464fbf2a541839a32a9c51, run 2026-11-11 07:10 JST
 
+Node: 7acf7de8e49d, Instance: IRIS
+
+USER>
+
+===============================================================================
+Directory: /tmp/
+===============================================================================
+  (root) begins ...
     Storm.WorkflowTests begins ...
       Test1H12RejectedCreatesOneTask() begins ...
         AssertEquals:service status (passed)
@@ -18,12 +24,14 @@
         AssertTrue:task names the alert to check (passed)
         AssertTrue:task states no automatic feedback (passed)
         AssertEquals:no confirm action offered (passed)
+        LogMessage:Duration of execution: 1.043145 sec.
       Test1H12RejectedCreatesOneTask passed
       Test2H12ResendStillOneTask() begins ...
         AssertEquals:resend returns saved FINAL (passed)
         AssertEquals:resend returns exact saved receipt (passed)
         AssertTrue:workflow queue drained (passed)
         AssertEquals:still exactly one review task after 3 resends (passed)
+        LogMessage:Duration of execution: .75836 sec.
       Test2H12ResendStillOneTask passed
       Test3H12ConcurrentStillOneTask() begins ...
         AssertEquals:all concurrent submissions returned (passed)
@@ -32,12 +40,14 @@
         AssertEquals:durable final receipt (passed)
         AssertTrue:workflow queue drained (passed)
         AssertEquals:exactly one review task for 4 concurrent arrivals (passed)
+        LogMessage:Duration of execution: 1.265512 sec.
       Test3H12ConcurrentStillOneTask passed
       Test4SuccessCasesCreateNoTask() begins ...
         AssertEquals:14 existing fixtures FINAL (passed)
         AssertTrue:workflow queue drained (passed)
         AssertEquals:success cases create 0 review tasks (passed)
         AssertEquals:success cases have no review marker (passed)
+        LogMessage:Duration of execution: 1.240196 sec.
       Test4SuccessCasesCreateNoTask passed
       Test5FailureNotConfirmedNoTask() begins ...
         AssertEquals:failure is UNKNOWN, not FINAL (passed)
@@ -45,6 +55,7 @@
         AssertEquals:no result saved (passed)
         AssertTrue:workflow queue drained (passed)
         AssertEquals:no review task on failure (passed)
+        LogMessage:Duration of execution: .768594 sec.
       Test5FailureNotConfirmedNoTask passed
       Test6RoleRestrictedToOneReviewer() begins ...
         AssertEquals:Storm.Review role has exactly one member (passed)
@@ -55,6 +66,7 @@
         AssertEquals:worklist item belongs to stormreviewer (passed)
         AssertEquals:role member owns the task (passed)
         AssertEquals:AutoCreateRole is off on the Workflow operation (passed)
+        LogMessage:Duration of execution: .177635 sec.
       Test6RoleRestrictedToOneReviewer passed
       Test7HumanDecisionNotFedBack() begins ...
         AssertEquals:reviewer action accepted (passed)
@@ -64,15 +76,16 @@
         AssertEquals:stored root cause unchanged after reviewer action (passed)
         AssertEquals:receipt status unchanged (passed)
         AssertEquals:still one task (passed)
+        LogMessage:Duration of execution: 2.025832 sec.
       Test7HumanDecisionNotFedBack passed
       Test8RealContentionOneTask() begins ...
-21:18:12.075:Ens.Director: Production 'Storm.DemoProduction' updating... (UpdateTimeout: 30s, Force flag: 0)
-21:18:12.090:Ens.Director: Production 'Storm.DemoProduction' updated.
-21:18:12.605:Ens.Director: Production 'Storm.DemoProduction' updating... (UpdateTimeout: 30s, Force flag: 0)
-21:18:12.609:Ens.Director: ConfigItem 'Storm.Process' (Ens.Actor) stopped in job 691
-21:18:12.609:Ens.Director: ConfigItem 'Storm.Process' (Ens.Actor) stopped in job 752
-21:18:12.609:Ens.Director: ConfigItem 'Storm.Process' (Ens.Actor) stopped in job 753
-21:18:12.610:Ens.Director: Production 'Storm.DemoProduction' updated.
+22:10:53.333:Ens.Director: Production 'Storm.DemoProduction' updating... (UpdateTimeout: 30s, Force flag: 0)
+22:10:53.376:Ens.Director: Production 'Storm.DemoProduction' updated.
+22:10:53.923:Ens.Director: Production 'Storm.DemoProduction' updating... (UpdateTimeout: 30s, Force flag: 0)
+22:10:53.953:Ens.Director: ConfigItem 'Storm.Process' (Ens.Actor) stopped in job 691
+22:10:53.953:Ens.Director: ConfigItem 'Storm.Process' (Ens.Actor) stopped in job 743
+22:10:53.953:Ens.Director: ConfigItem 'Storm.Process' (Ens.Actor) stopped in job 744
+22:10:53.953:Ens.Director: Production 'Storm.DemoProduction' updated.
         LogMessage:pool=4 statuses: FINAL,FINAL,FINAL,FINAL lock_contended=3
         AssertEquals:all concurrent submissions returned (passed)
         AssertTrue:storm lock contention actually observed (passed)
@@ -81,21 +94,30 @@
         AssertTrue:workflow queue drained (passed)
         AssertEquals:exactly one review task under real contention (passed)
         AssertEquals:pool restored to 1 (passed)
+        LogMessage:Duration of execution: 1.378692 sec.
       Test8RealContentionOneTask passed
+      Test9RoleMissingThenSetup() begins ...
+        AssertEquals:role removed for this test (passed)
+        AssertEquals:storm still FINAL without the role (passed)
+        AssertEquals:review kept pending, not marked sent (passed)
+        AssertTrue:workflow queue drained (passed)
+        AssertEquals:no task while the role is missing (passed)
+        AssertEquals:admin setup step (passed)
+        AssertEquals:resend returns the saved result unchanged (passed)
+        AssertTrue:workflow queue drained (passed)
+        AssertEquals:one task after setup and resend (passed)
+        AssertEquals:review marked requested (passed)
+        AssertTrue:workflow queue drained (passed)
+        AssertEquals:still one task after another resend (passed)
+        LogMessage:Duration of execution: 2.470073 sec.
+      Test9RoleMissingThenSetup passed
     Storm.WorkflowTests passed
   Skipping deleting classes 
   (root) passed
 
 Use the following URL to view the result:
-http://192.168.96.2:52773/csp/sys/%25UnitTest.Portal.Indices.cls?Index=2&$NAMESPACE=USER
+http://192.168.160.2:52773/csp/sys/%25UnitTest.Portal.Indices.cls?Index=2&$NAMESPACE=USER
 All PASSED
-All PASSED: methods=8 assertions_passed=52 assertions_failed=0
+All PASSED: methods=9 assertions_passed=64 assertions_failed=0
 
-# Regression, same fresh container:
-# Storm.Tests.RunTests() (Storm.NativeTests):
-All PASSED: methods=12 assertions_passed=72 assertions_failed=0
-# python3 tests/run_tests.py (host, same tree):
-Ran 18 tests in 0.542s
-{"errors": 0, "executed_assertion_checks": 252, "failures": 0, "native_assertions_passed": 72, "native_executed": true, "native_test_methods_defined": 12, "native_test_methods_passed": 12, "python_test_methods": 18}
-# python3 tests/review_gate_check.py:
-{"cases_checked": 29, "cases_with_review": ["H12"]}
+USER>

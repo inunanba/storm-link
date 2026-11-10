@@ -1,4 +1,15 @@
-# Storm.Tests.RunTests() output from bonus-extras verify (compose smoke run, 2026-11-05 JST)
+# Storm.NativeTests: Storm.Tests.RunTests()
+# isolated container stormwf-iris-1 (node 7acf7de8e49d), image storm-wf:release-104-ship-ipm sha256:ab14fca0adf92da5dbd2262f8c3875eb53b3631cd2f26070f2ee56b2fa8162bb, source commit 2455c9aea9e16e4537464fbf2a541839a32a9c51, run 2026-11-11 07:10 JST
+
+Node: 7acf7de8e49d, Instance: IRIS
+
+USER>
+
+===============================================================================
+Directory: /tmp/
+===============================================================================
+  (root) begins ...
+    Storm.NativeTests begins ...
       TestA1() begins ...
         AssertEquals:fixture available (passed)
         AssertEquals:service status (passed)
@@ -6,7 +17,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .005901 sec.
+        LogMessage:Duration of execution: .398854 sec.
       TestA1 passed
       TestA2() begins ...
         AssertEquals:fixture available (passed)
@@ -15,7 +26,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .041468 sec.
+        LogMessage:Duration of execution: .049597 sec.
       TestA2 passed
       TestA3() begins ...
         AssertEquals:fixture available (passed)
@@ -24,7 +35,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .048174 sec.
+        LogMessage:Duration of execution: .057774 sec.
       TestA3 passed
       TestA4() begins ...
         AssertEquals:fixture available (passed)
@@ -33,7 +44,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .044869 sec.
+        LogMessage:Duration of execution: .043364 sec.
       TestA4 passed
       TestC01() begins ...
         AssertEquals:fixture available (passed)
@@ -42,7 +53,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .00467 sec.
+        LogMessage:Duration of execution: .038732 sec.
       TestC01 passed
       TestC02() begins ...
         AssertEquals:fixture available (passed)
@@ -51,7 +62,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .07978 sec.
+        LogMessage:Duration of execution: .036591 sec.
       TestC02 passed
       TestC03() begins ...
         AssertEquals:fixture available (passed)
@@ -60,7 +71,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .035533 sec.
+        LogMessage:Duration of execution: .042124 sec.
       TestC03 passed
       TestC04() begins ...
         AssertEquals:fixture available (passed)
@@ -69,7 +80,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .031406 sec.
+        LogMessage:Duration of execution: .033193 sec.
       TestC04 passed
       TestC05() begins ...
         AssertEquals:fixture available (passed)
@@ -78,7 +89,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .030301 sec.
+        LogMessage:Duration of execution: .034419 sec.
       TestC05 passed
       TestC06() begins ...
         AssertEquals:fixture available (passed)
@@ -87,7 +98,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .036037 sec.
+        LogMessage:Duration of execution: .03242 sec.
       TestC06 passed
       TestC07() begins ...
         AssertEquals:fixture available (passed)
@@ -96,7 +107,7 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .034994 sec.
+        LogMessage:Duration of execution: .03273 sec.
       TestC07 passed
       TestC08() begins ...
         AssertEquals:fixture available (passed)
@@ -105,13 +116,15 @@
         AssertEquals:durable final receipt (passed)
         AssertEquals:same ID returns exact saved receipt (passed)
         AssertEquals:same ID does not rerun workflow (passed)
-        LogMessage:Duration of execution: .032411 sec.
+        LogMessage:Duration of execution: .040084 sec.
       TestC08 passed
     Storm.NativeTests passed
   Skipping deleting classes 
   (root) passed
 
 Use the following URL to view the result:
-http://172.29.0.2:52773/csp/sys/%25UnitTest.Portal.Indices.cls?Index=1&$NAMESPACE=USER
+http://192.168.160.2:52773/csp/sys/%25UnitTest.Portal.Indices.cls?Index=1&$NAMESPACE=USER
 All PASSED
 All PASSED: methods=12 assertions_passed=72 assertions_failed=0
+
+USER>
