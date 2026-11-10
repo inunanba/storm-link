@@ -1,0 +1,222 @@
+[
+  {
+    "id": "B01",
+    "alerts": [
+      {
+        "id": "a0",
+        "c": "Router.ADT",
+        "t": 0,
+        "text": "ADT transformation omits ward code"
+      },
+      {
+        "id": "a1",
+        "c": "DB.Out.EHR",
+        "t": 6,
+        "text": "Insert rejected: ward code absent"
+      },
+      {
+        "id": "a2",
+        "c": "HL7.Out.RadB",
+        "t": 9,
+        "text": "Destination rejects missing ward code"
+      }
+    ],
+    "truth": [
+      {
+        "root": "a0",
+        "members": [
+          "a0",
+          "a1",
+          "a2"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B02",
+    "alerts": [
+      {
+        "id": "a0",
+        "c": "FTP.In.Claims",
+        "t": 0,
+        "text": "Remote account disabled"
+      },
+      {
+        "id": "a1",
+        "c": "Claims.Process",
+        "t": 80,
+        "text": "Inactivity after intake stopped"
+      },
+      {
+        "id": "a2",
+        "c": "Claims.Out.Payer",
+        "t": 30,
+        "text": "Payer gateway maintenance notice"
+      }
+    ],
+    "truth": [
+      {
+        "root": "a0",
+        "members": [
+          "a0",
+          "a1"
+        ]
+      },
+      {
+        "root": "a2",
+        "members": [
+          "a2"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B03",
+    "alerts": [
+      {
+        "id": "a0",
+        "c": "Lab.In.ORU",
+        "t": 0,
+        "text": "Acknowledgement waiting"
+      },
+      {
+        "id": "a1",
+        "c": "Router.ORU",
+        "t": 10,
+        "text": "Queue grows for results feed"
+      },
+      {
+        "id": "a2",
+        "c": "HL7.Out.EHRResults",
+        "t": 13,
+        "text": "Results receiver rejects all connections"
+      }
+    ],
+    "truth": [
+      {
+        "root": "a2",
+        "members": [
+          "a2",
+          "a0",
+          "a1"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B04",
+    "alerts": [
+      {
+        "id": "a0",
+        "c": "Claims.Out.Payer",
+        "t": 0,
+        "text": "Rejected: payer schema changed"
+      },
+      {
+        "id": "a1",
+        "c": "Claims.Out.Payer",
+        "t": 62,
+        "text": "Rejected: payer schema changed"
+      },
+      {
+        "id": "a2",
+        "c": "FHIR.Out.Repo",
+        "t": 5,
+        "text": "Repository throttled unrelated batch"
+      }
+    ],
+    "truth": [
+      {
+        "root": "a0",
+        "members": [
+          "a0",
+          "a1"
+        ]
+      },
+      {
+        "root": "a2",
+        "members": [
+          "a2"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B05",
+    "alerts": [
+      {
+        "id": "a0",
+        "c": "FHIR.Out.Repo",
+        "t": 0,
+        "text": "Repository responds with 503"
+      },
+      {
+        "id": "a1",
+        "c": "FHIR.Process.Transform",
+        "t": 7,
+        "text": "Output queue blocked after repository outage"
+      },
+      {
+        "id": "a2",
+        "c": "FHIR.In.API",
+        "t": 19,
+        "text": "Requests waiting for transform"
+      }
+    ],
+    "truth": [
+      {
+        "root": "a0",
+        "members": [
+          "a0",
+          "a1",
+          "a2"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "B06",
+    "alerts": [
+      {
+        "id": "a0",
+        "c": "Router.ADT",
+        "t": 0,
+        "text": "ADT routing table missing facility"
+      },
+      {
+        "id": "a1",
+        "c": "HL7.Out.LabA",
+        "t": 4,
+        "text": "Route omitted because facility unknown"
+      },
+      {
+        "id": "a2",
+        "c": "DB.Out.EHR",
+        "t": 2,
+        "text": "Backup job holding database lock"
+      },
+      {
+        "id": "a3",
+        "c": "Claims.Process",
+        "t": 8,
+        "text": "Claims writes waiting on shared database"
+      }
+    ],
+    "truth": [
+      {
+        "root": "a0",
+        "members": [
+          "a0",
+          "a1"
+        ]
+      },
+      {
+        "root": "a2",
+        "members": [
+          "a2",
+          "a3"
+        ]
+      }
+    ]
+  }
+]
