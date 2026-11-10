@@ -63,6 +63,28 @@ def validate_answer(value):
         raise ValueError('reason contains control characters')
     return dict(value)
 
+def gate_review(case, trace):
+    """Groups whose AI proposal the deterministic gate rejected, with the questions a human should re-check.
+    bench.solve appends, per flagged graph group in order, one trace entry per question and then
+    ('GATE REJECT', id) if the proposal was discarded. The kept result is the graph-rule group."""
+    am = {a['id']: a for a in case['alerts']}
+    items, pos = [], 0
+    for grp in bench.m_graph(case):
+        qs = bench.detect(case, grp) if len(grp['members']) > 1 else []
+        if not qs:
+            continue
+        entries, pos = trace[pos:pos + len(qs)], pos + len(qs)
+        if pos < len(trace) and trace[pos][0] == 'GATE REJECT':
+            pos += 1
+            checks = []
+            for key, ans, reason in entries:
+                kind, rid, xid = key.rsplit(':', 3)[1:]
+                checks.append({'kind': kind, 'root': rid, 'member': xid, 'ai_answer': ans, 'ai_reason': reason,
+                               'root_alert': {'c': am[rid]['c'], 'text': am[rid]['text']},
+                               'member_alert': {'c': am[xid]['c'], 'text': am[xid]['text']}})
+            items.append({'kept_root': grp['root'], 'kept_members': list(grp['members']), 'checks': checks})
+    return {'reason': 'ai_proposal_rejected_by_gate', 'groups': items} if items else None
+
 class Pending(Exception):
     def __init__(self, question):
         self.question = question
@@ -117,8 +139,13 @@ class Engine:
             if sorted(ids) != sorted(flat) or any(g['root'] not in g['members'] for g in groups):
                 raise ValueError('partition gate failed')
             s['pending'] = None
-            return {'token': token, 'status': 'FINAL', 'mode': self.mode, 'groups': groups,
-                    'answers': s['answers'], 'topology_hash': fingerprint(bench.TOPO), 'input_hash': s['digest']}
+            out = {'token': token, 'status': 'FINAL', 'mode': self.mode, 'groups': groups,
+                   'answers': s['answers'], 'topology_hash': fingerprint(bench.TOPO), 'input_hash': s['digest']}
+            review = gate_review(s['case'], trace)
+            if review:
+                # Side channel for IRIS only: Storm.Process removes it before the receipt is saved.
+                out['review'] = review
+            return out
         except Pending as p:
             if len(s['answers']) >= MAX_QUESTIONS:
                 raise ValueError('question bound exceeded')

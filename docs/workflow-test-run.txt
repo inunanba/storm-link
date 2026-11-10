@@ -1,0 +1,73 @@
+# Storm.Tests.RunTests("Storm.WorkflowTests") output, same fresh run as docs/workflow-review-evidence.txt
+      Test1H12RejectedCreatesOneTask() begins ...
+        AssertEquals:service status (passed)
+        AssertEquals:existing contract: rejected proposal still returns FINAL with rule grouping (passed)
+        AssertEquals:review side channel not in result payload (passed)
+        AssertEquals:rule grouping kept (AI split not applied) (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertTrue:workflow queue drained (passed)
+        AssertEquals:exactly one review task (passed)
+        AssertEquals:review requested once (passed)
+        AssertEquals:task routed to the Storm.Review role (passed)
+        AssertTrue:task says what to check (passed)
+        AssertTrue:task names the alert to check (passed)
+        AssertTrue:task states no automatic feedback (passed)
+        AssertEquals:no confirm action offered (passed)
+      Test1H12RejectedCreatesOneTask passed
+      Test2H12ResendStillOneTask() begins ...
+        AssertEquals:resend returns saved FINAL (passed)
+        AssertEquals:resend returns exact saved receipt (passed)
+        AssertTrue:workflow queue drained (passed)
+        AssertEquals:still exactly one review task after 3 resends (passed)
+      Test2H12ResendStillOneTask passed
+      Test3H12ConcurrentStillOneTask() begins ...
+        AssertEquals:all concurrent submissions returned (passed)
+        LogMessage:concurrent statuses: FINAL,FINAL,FINAL,FINAL
+        AssertTrue:at least one concurrent submission FINAL (passed)
+        AssertEquals:durable final receipt (passed)
+        AssertTrue:workflow queue drained (passed)
+        AssertEquals:exactly one review task for 4 concurrent arrivals (passed)
+      Test3H12ConcurrentStillOneTask passed
+      Test4SuccessCasesCreateNoTask() begins ...
+        AssertEquals:14 existing fixtures FINAL (passed)
+        AssertTrue:workflow queue drained (passed)
+        AssertEquals:success cases create 0 review tasks (passed)
+        AssertEquals:success cases have no review marker (passed)
+      Test4SuccessCasesCreateNoTask passed
+      Test5FailureNotConfirmedNoTask() begins ...
+        AssertEquals:failure is UNKNOWN, not FINAL (passed)
+        AssertEquals:receipt not confirmed (passed)
+        AssertEquals:no result saved (passed)
+        AssertTrue:workflow queue drained (passed)
+        AssertEquals:no review task on failure (passed)
+      Test5FailureNotConfirmedNoTask passed
+      Test6RoleRestrictedToOneReviewer() begins ...
+        AssertEquals:Storm.Review role has exactly one member (passed)
+        AssertEquals:member is stormreviewer (passed)
+        AssertEquals:one worklist item for the H12 task (passed)
+        AssertEquals:no worklist item for anyone outside the role (passed)
+        AssertEquals:outsider inbox is empty (passed)
+        AssertEquals:worklist item belongs to stormreviewer (passed)
+        AssertEquals:role member owns the task (passed)
+        AssertEquals:AutoCreateRole is off on the Workflow operation (passed)
+      Test6RoleRestrictedToOneReviewer passed
+      Test7HumanDecisionNotFedBack() begins ...
+        AssertEquals:reviewer action accepted (passed)
+        LogMessage:ProcessAction msg=
+        AssertEquals:task completed by reviewer (passed)
+        AssertEquals:reviewer action recorded on the task only (passed)
+        AssertEquals:stored root cause unchanged after reviewer action (passed)
+        AssertEquals:receipt status unchanged (passed)
+        AssertEquals:still one task (passed)
+      Test7HumanDecisionNotFedBack passed
+All PASSED
+All PASSED: methods=7 assertions_passed=45 assertions_failed=0
+
+# Regression, same fresh container:
+# Storm.Tests.RunTests() (Storm.NativeTests):
+All PASSED: methods=12 assertions_passed=72 assertions_failed=0
+# python3 tests/run_tests.py (host, same tree):
+{"errors": 0, "executed_assertion_checks": 252, "failures": 0, "native_assertions_passed": 72, "native_executed": true, "native_test_methods_defined": 12, "native_test_methods_passed": 12, "python_test_methods": 18}
+Ran 18 tests in 0.536s
+# python3 tests/review_gate_check.py:
+{"cases_checked": 29, "cases_with_review": ["H12"]}

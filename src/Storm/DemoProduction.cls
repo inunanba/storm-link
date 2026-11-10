@@ -10,6 +10,9 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="HTTPPort">8088</Setting>
   </Item>
   <Item Name="Storm.Agent" ClassName="Storm.AgentOperation" PoolSize="1" Enabled="true"/>
+  <Item Name="Storm.Review" ClassName="EnsLib.Workflow.Operation" PoolSize="1" Enabled="true">
+    <Setting Target="Host" Name="AutoCreateRole">0</Setting>
+  </Item>
 </Production>
 }
 }

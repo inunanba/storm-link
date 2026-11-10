@@ -39,6 +39,9 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
         Set state=..CallWorker("/answer",body.%ToJSON())
       }
       If state.status'="FINAL" { Throw ##class(%Exception.General).%New("worker result not final") }
+      // Gate-rejected AI proposal: kept out of the decision/result contract, used only for a human review task.
+      Set review=""
+      If state.%IsDefined("review") { Set review=state.review Do state.%Remove("review") }
       // Best-effort similar-storm lookup (Embedded Python + VECTOR_COSINE); never blocks the receipt.
       Set similar=""
       Try {
@@ -85,9 +88,12 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
         If $$$ISERR(sc) { Throw ##class(%Exception.General).%New("similar-storm reason save failed") }
         Set ^Storm.Receipt(rid,"similar")=similar
       }
+      If $IsObject(review) { Set ^Storm.Receipt(rid,"review")="PENDING",^Storm.Receipt(rid,"review","detail")=review.%ToJSON() }
       Set ^Storm.Receipt(rid,"result")=state.%ToJSON(),^Storm.Receipt(rid,"status")="FINAL"
       TCommit
       Set tx=0,pResponse.Status="FINAL",pResponse.Payload=state.%ToJSON()
+      // Still under the storm lock and only on the first FINAL: at most one review task per storm.
+      If $IsObject(review) Do ..RequestReview(rid,review)
       Try { Do ##class(Storm.Signature).Record(rid,pRequest.Payload,state.%ToJSON()) } Catch {}
     }
   } Catch ex {
@@ -97,6 +103,19 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
   }
   Lock -^Storm.Receipt(rid)
   Quit $$$OK
+}
+/// One native Workflow task (EnsLib.Workflow.Operation "Storm.Review"); fire-and-forget, no response is awaited,
+/// so the reviewer's decision never flows back into this storm's root cause. Never throws.
+Method RequestReview(rid As %String, review As %DynamicObject)
+{
+  Try {
+    If $Get(^Storm.Receipt(rid,"review"))'="PENDING" Quit
+    Set task=##class(Storm.Review).BuildTask(rid,review)
+    Set sc=..SendRequestAsync(##class(Storm.Review).#ROLE,task,0,,"Storm "_rid_" human review")
+    Set ^Storm.Receipt(rid,"review")=$Select($$$ISOK(sc):"REQUESTED",1:"SEND_FAILED")
+  } Catch {
+    Set ^Storm.Receipt(rid,"review")="SEND_FAILED"
+  }
 }
 Method CallWorker(path As %String, body As %String) As %DynamicObject
 {

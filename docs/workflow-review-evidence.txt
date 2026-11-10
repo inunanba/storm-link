@@ -1,0 +1,75 @@
+# Storm Link human review via native IRIS Workflow - evidence dump
+# Branch boost-workflow-01, isolated compose project 'stormwf' (portal 127.0.0.1:52791), fresh container, run 2026-11-10 22:01 JST
+# $ZV: IRIS for UNIX (Ubuntu Server LTS for x86-64 Containers) 2026.3.0AI (Build 154U) Thu Sep 24 2026 10:04:49 EDT
+# Base image iris-ai-hub:local154 (id 1d3d52bf15f4). Event Log TimeLogged values are UTC.
+# Produced by: Storm.Tests.RunTests("Storm.NativeTests") then RunTests("Storm.WorkflowTests"), then the SQL queries below.
+
+== EnsLib_Workflow.RoleMembership ==
+RoleName	UserName	Ranking	Title
+Storm.Review	stormreviewer	1	Reviewer
+1 Rows(s) Affected
+== EnsLib_Workflow.UserDefinition ==
+Name	FullName	IsActive
+stormoutsider	not in role	1
+stormreviewer	Storm Link reviewer	1
+2 Rows(s) Affected
+== EnsLib_Workflow.TaskResponse (all Workflow tasks in this namespace) ==
+ID	%RoleName	%Subject	%Actions	%Action	%Status	%Priority
+110	Storm.Review	Storm H12: AI root-cause proposal rejected by gate - human check	Checked,NeedsEngineer	Checked	Completed	2
+132	Storm.Review	Storm H12P: AI root-cause proposal rejected by gate - human check	Checked,NeedsEngineer		Unassigned	2
+2 Rows(s) Affected
+== EnsLib_Workflow.Worklist (open inbox items) ==
+ID	UserName	RoleName	Subject
+132||stormreviewer	stormreviewer	Storm.Review	Storm H12P: AI root-cause proposal rejected by gate - human check
+1 Rows(s) Affected
+== Task status per task ==
+110 AssignedTo=stormreviewer IsComplete=1 Source=Storm.Process
+132 AssignedTo= IsComplete=0 Source=Storm.Process
+== Review task count per storm id ==
+H12 status=FINAL review_marker=REQUESTED tasks=1
+H12P status=FINAL review_marker=REQUESTED tasks=1
+H12F status=UNKNOWN review_marker=(none) tasks=0
+A1W status=FINAL review_marker=(none) tasks=0
+A2W status=FINAL review_marker=(none) tasks=0
+A3W status=FINAL review_marker=(none) tasks=0
+A4W status=FINAL review_marker=(none) tasks=0
+A5W status=FINAL review_marker=(none) tasks=0
+A6W status=FINAL review_marker=(none) tasks=0
+C01W status=FINAL review_marker=(none) tasks=0
+C02W status=FINAL review_marker=(none) tasks=0
+C03W status=FINAL review_marker=(none) tasks=0
+C04W status=FINAL review_marker=(none) tasks=0
+C05W status=FINAL review_marker=(none) tasks=0
+C06W status=FINAL review_marker=(none) tasks=0
+C07W status=FINAL review_marker=(none) tasks=0
+C08W status=FINAL review_marker=(none) tasks=0
+A1 status=FINAL review_marker=(none) tasks=0
+C01 status=FINAL review_marker=(none) tasks=0
+== H12 task message ==
+Storm H12: the AI proposal for this alert group was rejected by the Storm Link gate.
+Stored result keeps the topology-rule grouping unchanged. Nothing in this storm was confirmed by AI.
+This task does not change the stored root cause; record your finding in your own process.
+Kept group: root a0, members a0,a1,a2
+Check 1: is the other alert caused by the same problem as the root?
+  root a0 [FTP.In.Claims] File claims_1102.x12 rejected: ISA segment length 105, expected 106
+  other a1 [Claims.Process] Envelope validation failed for batch 1102
+  AI answered no: The root alert on FTP.In.Claims is related to the ISA segment length, while the other alert on Claims.Process is related to envelope validation, which is a different issue.
+Check 2: is the other alert caused by the same problem as the root?
+  root a0 [FTP.In.Claims] File claims_1102.x12 rejected: ISA segment length 105, expected 106
+  other a2 [DB.Out.EHR] ERROR #6022: Gateway failed: network path not found
+  AI answered no: The root alert on FTP.In.Claims is related to a specific file claim issue, while the other alert on DB.Out.EHR is a more general gateway failure, indicating a different potential cause.
+== H12 stored result (unchanged contract keys) ==
+keys: token status mode groups answers topology_hash input_hash 
+groups: [{"root":"a0","members":["a0","a1","a2"]}]
+== Event Log errors/warnings (Ens_Util.Log Type 2,3) ==
+ID	TimeLogged	ConfigName	Type	Text
+12	2026-11-10 13:00:49.157		3	No Return Queue - Unable to send deferred Response to Request 109
+1 Rows(s) Affected
+== Production item status ==
+Name	ClassName	Enabled
+Storm.Service	Storm.Service	1
+Storm.Process	Storm.Process	1
+Storm.WorkerOp	Storm.WorkerOperation	1
+Storm.Agent	Storm.AgentOperation	1
+Storm.Review	EnsLib.Workflow.Operation	1
+5 Rows(s) Affected
