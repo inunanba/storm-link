@@ -6,7 +6,7 @@
 
 When one interface fails, every component downstream raises its own alert. Storm Link uses a versioned Production topology graph, folds the storm into one root cause on a native Managed Alert, and asks a small model only the yes/no questions the graph cannot settle.
 
-**1. Watch the demo video:** https://youtu.be/N950ADnIfTc
+**1. Watch the demo video:** https://youtu.be/N950ADnIfTc (MP4 download, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4))
 
 **2. See the results.**
 
@@ -168,6 +168,23 @@ Interoperability Production, `%AI.Agent`, Visual Trace, Managed Alerts, transact
 | **Custom Adapter (+2)** | `Storm.WorkerAdapter` (custom outbound) is the Production adapter on `Storm.WorkerOp`. Every `/start` and `/answer` call to the private worker goes through that adapter, so Visual Trace shows Service → Process → WorkerOp → Process. |
 | **Embedded Python (+3)** | `Storm.Signature.Embed` is an IRIS method with `Language = python` that turns the alert set into a 32-dim signature. `Storm.Signature.FindSimilar` is also `Language = python` and uses `import iris` to run the VECTOR SQL from inside IRIS. |
 | **IRIS Vector Search (+2)** | Table `Storm_Signature` stores each FINAL storm as `VECTOR(DOUBLE, 32)`. After the graph (and agent, when needed) settles a storm, `VECTOR_COSINE` finds the nearest past storm and the match is written onto the root Managed Alert as an action reason. |
+
+## Contest bonuses
+
+Every bonus this entry claims, with the place to check it:
+
+| Bonus | Evidence |
+|---|---|
+| Video | YouTube: https://youtu.be/N950ADnIfTc · MP4, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4) ([release](https://github.com/inunanba/storm-link/releases/tag/media-v1)) |
+| Community Idea | [DPI-I-689](https://ideas.intersystems.com/ideas/DPI-I-689), also [DPI-I-627](https://ideas.intersystems.com/ideas/DPI-I-627); how they are implemented: [Community Idea implemented](#community-idea-implemented) |
+| Article (EN) | [English article on the InterSystems Developer Community](https://community.intersystems.com/post/storm-link-finding-one-cause-behind-alert-storm-inside-intersystems-iris) |
+| Article translation (JA) | [Japanese article on the Japanese Developer Community](https://jp.community.intersystems.com/node/590748) |
+| Docker | `docker compose up -d --build` — see [Quick start](#quick-start) |
+| IPM | package `storm-link` 1.0.1, `zpm "install storm-link"`; `module.xml` at the repo root |
+| Embedded Python | `Storm.Signature.Embed` and `Storm.Signature.FindSimilar` (`Language = python`) — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
+| IRIS Vector Search | `Storm_Signature` table with `VECTOR(DOUBLE, 32)` and `VECTOR_COSINE` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
+| Custom Adapter | `Storm.WorkerAdapter` on `Storm.WorkerOp` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
+| Questionnaire | submitted |
 
 ## Troubleshooting
 
