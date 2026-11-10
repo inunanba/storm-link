@@ -6,9 +6,9 @@
 
 **Try it live:** https://nemesis-evoke-guidance.ngrok-free.dev/ — a running, read-only IRIS demo that replays recorded AI answers. Click Visit Site on the ngrok notice, then sign in as `viewer` / `StormLink-Viewer-2026`.
 
-[![Storm A1 in the live demo: Managed Alert 4, root cause DB.Out.EHR, with the AI evidence as the action reason](docs/img/live-demo-A1-managed-alert.png)](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.ManagedAlertViewer.zen)
+[![Storm A1 in the online demo: Managed Alert 4, source DB.Out.EHR, Action 4 Reason citing error #6022 from SQLServer.EHR](docs/img/live-demo-A1-managed-alert.png)](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.ManagedAlertViewer.zen)
 
-In the live demo, [Managed Alerts](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.ManagedAlertViewer.zen) → alert 4 is storm A1's root cause `DB.Out.EHR`. Open Action 4 to read the evidence: both alerts report error #6022 from `SQLServer.EHR`, so they share one cause. The same storm as one session: [Visual Trace, session 6](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=6) ([screenshot](docs/img/live-demo-A1-visual-trace.png)).
+In the online demo, open [Managed Alerts](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.ManagedAlertViewer.zen) → alert 4 → Action 4 → Reason. Storm Link identified `DB.Out.EHR` as storm A1's root cause; the recorded explanation cites error #6022 from `SQLServer.EHR`. The same storm as one session: [Visual Trace, session 6](https://nemesis-evoke-guidance.ngrok-free.dev/csp/user/EnsPortal.VisualTrace.zen?SESSIONID=6) ([screenshot](docs/img/live-demo-A1-visual-trace.png)). Full-window view of the alert: [screenshot](docs/img/live-demo-A1-managed-alert-full.png).
 
 When one interface fails, every component downstream raises its own alert. Storm Link uses a versioned Production topology graph, folds the storm into one root cause on a native Managed Alert, and asks a small model only the yes/no questions the graph cannot settle.
 
@@ -183,7 +183,7 @@ Every bonus this entry claims, with the place to check it:
 
 | Bonus | Evidence |
 |---|---|
-| Online demo | Live IRIS (read-only): https://nemesis-evoke-guidance.ngrok-free.dev/ — click Visit Site on the ngrok notice, then sign in as `viewer` / `StormLink-Viewer-2026`. Landing page: Managed Alerts, Visual Trace of storm A1, and Message Viewer. IRIS AI Hub build 154, Production in replay mode, storms A1 and C01 preloaded. |
+| Online demo | Running IRIS, read-only, replaying recorded AI answers: https://nemesis-evoke-guidance.ngrok-free.dev/ — click Visit Site on the ngrok notice, then sign in as `viewer` / `StormLink-Viewer-2026`. Landing page: Managed Alerts, Visual Trace of storm A1, and Message Viewer. IRIS AI Hub build 154, Production in replay mode, storms A1 and C01 preloaded. |
 | Video | YouTube: https://youtu.be/N950ADnIfTc · MP4, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4) ([release](https://github.com/inunanba/storm-link/releases/tag/media-v1)) |
 | Community Idea | [DPI-I-689](https://ideas.intersystems.com/ideas/DPI-I-689), also [DPI-I-627](https://ideas.intersystems.com/ideas/DPI-I-627); how they are implemented: [Community Idea implemented](#community-idea-implemented) |
 | Article (EN) | [English article on the InterSystems Developer Community](https://community.intersystems.com/post/storm-link-finding-one-cause-behind-alert-storm-inside-intersystems-iris) |
