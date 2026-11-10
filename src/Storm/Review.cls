@@ -59,6 +59,32 @@ ClassMethod BuildTask(rid As %String, review As %DynamicObject) As EnsLib.Workfl
   Quit task
 }
 
+/// Existing task for this storm id, matched exactly on the stored storm id in the subject.
+/// Checks the persisted task request first (exists as soon as the send is accepted, even if still queued),
+/// then delivered tasks. Returns "" when none exists.
+ClassMethod FindTask(rid As %String) As %String
+{
+  Set subj=..Subject(rid)
+  Set rs=##class(%SQL.Statement).%ExecDirect(,"SELECT TOP 1 ID FROM EnsLib_Workflow.TaskRequest WHERE %Subject = ? ORDER BY ID",subj)
+  Quit:rs.%Next() "request:"_rs.ID
+  Set rs=##class(%SQL.Statement).%ExecDirect(,"SELECT TOP 1 ID FROM EnsLib_Workflow.TaskResponse WHERE %Subject = ? ORDER BY ID",subj)
+  Quit:rs.%Next() "task:"_rs.ID
+  Quit ""
+}
+
+/// Test-only stop point. Inactive unless ^Storm.Test("crash",rid) names this point (set only by the crash test).
+/// One-shot: the hook is cleared and the arrival is recorded in a committed transaction (journal synced),
+/// then the job waits so the test can kill the whole IRIS container at exactly this point.
+ClassMethod CrashPoint(rid As %String, point As %String)
+{
+  Quit:$Get(^Storm.Test("crash",rid))'=point
+  TStart
+  Kill ^Storm.Test("crash",rid)
+  Set ^Storm.Test("reached",rid)=point_" "_$ZDT($ZTS,3,,3)
+  TCommit
+  Hang 120
+}
+
 /// Number of Workflow tasks created for this storm.
 ClassMethod CountTasks(rid As %String) As %Integer
 {

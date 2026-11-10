@@ -138,4 +138,40 @@ Method Test7HumanDecisionNotFedBack()
   Do $$$AssertEquals(##class(Storm.Review).CountTasks(rid),1,"still one task")
 }
 
+/// Real contention: Storm.Process pool raised to 4 for this test only (restored to 1 after),
+/// 4 simultaneous arrivals of one new storm id. The storm lock must be observed contended and one task created.
+Method Test8RealContentionOneTask()
+{
+  Set rid="H12C",payload=..Fixture("H12",rid),n=4
+  Kill ^StormWFT(rid),^Storm.Stat("lock_contended",rid)
+  Do ..SetProcessPool(4)
+  For i=1:1:n { Job ##class(Storm.WorkflowTests).SubmitJob(rid,payload,i) }
+  For w=1:1:240 { Set done=0 For i=1:1:n { Set:$Case($Get(^StormWFT(rid,i)),"":0,"START":0,:1) done=done+1 } Quit:done=n  Hang 0.5 }
+  Do ..SetProcessPool(1)
+  Set final=0 For i=1:1:n { Set:$Get(^StormWFT(rid,i))="FINAL" final=final+1 }
+  Do $$$LogMessage("pool=4 statuses: "_$Get(^StormWFT(rid,1))_","_$Get(^StormWFT(rid,2))_","_$Get(^StormWFT(rid,3))_","_$Get(^StormWFT(rid,4))_" lock_contended="_$Get(^Storm.Stat("lock_contended",rid),0))
+  Do $$$AssertEquals(done,n,"all concurrent submissions returned")
+  Do $$$AssertTrue($Get(^Storm.Stat("lock_contended",rid),0)>=1,"storm lock contention actually observed")
+  Do $$$AssertTrue(final>=1,"at least one FINAL")
+  Do $$$AssertEquals(##class(Storm.Process).Reconcile(rid),"FINAL","durable final receipt")
+  Do $$$AssertTrue(##class(Storm.Review).WaitQueue(),"workflow queue drained")
+  Do $$$AssertEquals(##class(Storm.Review).CountTasks(rid),1,"exactly one review task under real contention")
+  Do $$$AssertEquals(..ProcessPool(),1,"pool restored to 1")
+}
+
+ClassMethod ProcessPool() As %Integer
+{
+  Set prod=##class(Ens.Config.Production).%OpenId("Storm.DemoProduction"),size=""
+  For i=1:1:prod.Items.Count() { Set it=prod.Items.GetAt(i) Set:it.Name="Storm.Process" size=it.PoolSize }
+  Quit size
+}
+
+ClassMethod SetProcessPool(size As %Integer)
+{
+  Set prod=##class(Ens.Config.Production).%OpenId("Storm.DemoProduction")
+  For i=1:1:prod.Items.Count() { Set it=prod.Items.GetAt(i) Set:it.Name="Storm.Process" it.PoolSize=size }
+  Do prod.%Save()
+  Do ##class(Ens.Director).UpdateProduction(30)
+}
+
 }
