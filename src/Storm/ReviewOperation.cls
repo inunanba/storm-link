@@ -11,7 +11,12 @@ Method TaskHandler(pTask As EnsLib.Workflow.TaskRequest, Output pResponse As Ens
   Set rq=pTask.%Id(),existing=""
   Set rs=##class(%SQL.Statement).%ExecDirect(,"SELECT TOP 1 ID FROM EnsLib_Workflow.TaskResponse WHERE TaskStatus_Request = ? ORDER BY ID",rq)
   If rs.%Next() Set existing=rs.ID
-  Quit:existing="" ##super(pTask,.pResponse)
+  If existing="" {
+    Set sc=##super(pTask,.pResponse)
+    // Test-only stop point (inactive unless the crash test sets it): task distributed, message not yet completed.
+    If $$$ISOK(sc) Do ##class(Storm.Review).CrashPoint("op","after_distribute")
+    Quit sc
+  }
   Set task=##class(EnsLib.Workflow.TaskResponse).%OpenId(existing)
   Set rs=##class(%SQL.Statement).%ExecDirect(,"SELECT COUNT(*) AS n FROM EnsLib_Workflow.Worklist WHERE Task = ?",existing)
   Set items=$Select(rs.%Next():+rs.n,1:0)

@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Two-point stop/restart check for the gate-rejected review task (run on the host against an isolated stack).
+# Stop/restart check for the gate-rejected review task: the two required points plus two extra (run on the host against an isolated stack).
 #   STORM_PROJECT=stormwf ... docker compose -p stormwf up -d   (portal 127.0.0.1:52791)
 #   bash tests/crash_restart_check.sh  > docs/workflow-crash-restart-run.txt
 # Stop points: after_commit (FINAL committed, task not sent), after_send (send accepted, marker not updated),
-# after_send:nosync (same point, journal tail not forced to disk, so the accepted send may be lost by the kill).
+# after_distribute (inside the Storm.Review Workflow operation: task created, Ens message not yet completed,
+# so Ens redelivers the TaskRequest after restart), after_send:nosync (same point as after_send, journal tail not forced to disk, so the accepted send may be lost by the kill).
 # For each stop point the IRIS container is SIGKILLed (no clean shutdown) while the Storm.Process job waits
 # exactly at that point, then the stack is started again and the same storm is resent.
 set -u
@@ -16,12 +17,12 @@ drain(){ q 'Write "OUT|queue_drained=",##class(Storm.Review).WaitQueue(20),!'; }
 echo "# $(date '+%Y-%m-%d %H:%M:%S %Z') project=$P container=$C"
 echo "# image $(docker inspect -f '{{.Config.Image}} {{.Image}}' "$C")"
 echo "# source commit $(git rev-parse HEAD) (IRIS src baked into the image at build; tree clean for src/: $(git status --porcelain src | wc -l) changes)"
-for spec in after_commit:H12A after_send:H12B after_send:nosync:H12N; do
-  point=${spec%:*}; r=${spec##*:}
+for spec in after_commit:H12A after_send:H12B after_send:nosync:H12N after_distribute:H12O; do
+  point=${spec%:*}; r=${spec##*:}; hk=$r; [ "$point" = after_distribute ] && hk=op
   echo; echo "== stop point: $point  storm id: $r (H12 fixture, new id) =="
-  q "Kill ^IRIS.Temp.StormTest(\"reached\",\"$r\") Set ^IRIS.Temp.StormTest(\"crash\",\"$r\")=\"$point\" Write \"OUT|hook set\",!"
+  q "Kill ^IRIS.Temp.StormTest(\"reached\",\"$hk\") Set ^IRIS.Temp.StormTest(\"crash\",\"$hk\")=\"$point\" Write \"OUT|hook set (\",\"$hk\",\")\",!"
   q "Job ##class(Storm.WorkflowTests).SubmitJob(\"$r\",##class(Storm.WorkflowTests).Fixture(\"H12\",\"$r\"),1) Write \"OUT|submitted\",!"
-  for i in $(seq 1 120); do got=$(q "Write \"OUT|\",\$Get(^IRIS.Temp.StormTest(\"reached\",\"$r\")),!"); [ "$got" != "OUT|" ] && break; sleep 1; done
+  for i in $(seq 1 120); do got=$(q "Write \"OUT|\",\$Get(^IRIS.Temp.StormTest(\"reached\",\"$hk\")),!"); [ "$got" != "OUT|" ] && break; sleep 1; done
   echo "reached: ${got#OUT|}"
   echo -n "before kill:    "; q "Set r=\"$r\" $SNAP"
   pre=$(q "Set r=\"$r\" $H Write \"OUT|\",h,!"); pre=${pre#OUT|}
