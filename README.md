@@ -14,6 +14,8 @@ When one interface fails, every component downstream raises its own alert. Storm
 
 Evidence at a glance: the [live-mode trace of storm A1](docs/trace-A1-C01-live.txt) (Llama 3.2 3B answered both yes/no questions) and the [root Managed Alert](docs/img/managed-alert-A1-root.png) with the AI evidence written as an action reason. Submitting the same storm ID again returns the saved receipt.
 
+Different causes stay separate, too: in an isolated Storm Link 1.0.4 run, the IRIS AI Hub agent used a recorded answer for storm A2, Storm Link grouped the TCP listener and TLS certificate alerts under separate causes, and resending the same storm ID added no alerts ([A2 replay evidence](docs/a2-1.0.4-isolated-run.txt)).
+
 **1. Watch the demo video:** https://youtu.be/N950ADnIfTc (MP4 download, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4))
 
 **2. See the results.**
@@ -205,6 +207,7 @@ Every bonus this entry claims, with the place to check it:
 | Embedded Python | `Storm.Signature.Embed` and `Storm.Signature.FindSimilar` (`Language = python`) — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
 | IRIS Vector Search | `Storm_Signature` table with `VECTOR(DOUBLE, 32)` and `VECTOR_COSINE` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
 | Custom Adapter | `Storm.WorkerAdapter` on `Storm.WorkerOp` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
+| Workflow Engine | `Storm.ReviewOperation` (extends `EnsLib.Workflow.Operation`) is the `Storm.Review` item in `Storm.DemoProduction`; it brings AI proposals selected by the grouping-rule checks to a teammate's Workflow inbox. Fresh IPM 1.0.4 install with reviewer task and Checked: [run](docs/ipm-1.0.4-fresh-install.txt); stop/restart-then-resend: [evidence](docs/workflow-idempotency.txt); `Storm.WorkflowTests` 9 methods, 64 assertions: [log](docs/workflow-test-run.txt) |
 | Questionnaire | submitted |
 
 ## Troubleshooting

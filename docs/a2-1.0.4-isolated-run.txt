@@ -1,0 +1,51 @@
+# Storm Link 1.0.4: storm A2 in an isolated IRIS (recorded AI answers replayed)
+# Run 2026-11-11 19:23 JST. New empty container from iris-ai-hub:local154 (IRIS 2026.3 AI Hub build 154), portal on 127.0.0.1 only,
+# not the online demo. Container deleted after the run.
+# Package: storm-link-1.0.4.tgz downloaded from https://pm.community.intersystems.com/download/storm-link/-/storm-link-1.0.4.tgz
+#   sha1 b7217f18b460952b027c76f4f20801b5eb78c95f (registry hash), sha256 6a26dae1751f53656acf5fb249b17388582529b3aaeb20348e7ae6a3b16ce539
+# Installed with IPM (zpm-0.10.10): zpm "load /pkg/storm-link-1.0.4.tgz" -> all phases SUCCESS, storm-link 1.0.4.
+# Admin steps from the README: ^Storm.Config("worker.host")="127.0.0.1"; worker started with STORM_MODE=replay; StartProduction=1.
+# Mode: replay. The worker returns the answer recorded in recordings/ai_v2_dev.json ("A2:COINC:a0:a3", model llama3.2-3b-ctx16k, answer no);
+#   no model is called during this run. That recorded answer comes from an earlier real-model run (Llama 3.2 3B, local Ollama).
+# Input storm IDs: A1 (submitted once before this log), then A2, A2 again, A1 again. Fixtures: <mgr dir>/storm-link/fixtures/A1.json, A2.json.
+# A2 alerts: a0 HL7.In.ADT "TCP listener on port 5000 stopped", a1 Router.ADT inactivity, a2 HL7.Out.LabA inactivity,
+#   a3 HL7.Out.RadB "TLS handshake failed: remote certificate expired".
+# Worker session tokens in PAYLOAD are replaced with <redacted>.
+
+BEFORE2 managed_alerts=3
+SUBMIT CASE=A2 SC=1 STATUS=FINAL ALERTS_NEW=4 PRIOR_RESULT_PRESENT=0 RESULT_IDENTICAL_TO_PRIOR=n/a RESULT_LEN=586
+PAYLOAD={"token":"<redacted>","status":"FINAL","mode":"replay","groups":[{"root":"a0","members":["a0","a1","a2"]},{"root":"a3","members":["a3"]}],"answers":{"fbe20fa9f1f15814205dbde2741397982b158580e43cd3bd4f022ce9fa6cebbf":{"answer":"no","reason":"The root alert is related to a TCP listener issue, while the downstream alert is related to a TLS handshake issue, indicating different underlying problems."}},"topology_hash":"0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332","input_hash":"86a910200b0ef300f20d20547313971540fe23f34382bf1658e6f21210ac1e8d"}
+SUBMIT CASE=A2 SC=1 STATUS=FINAL ALERTS_NEW=0 PRIOR_RESULT_PRESENT=1 RESULT_IDENTICAL_TO_PRIOR=1 RESULT_LEN=586
+PAYLOAD={"token":"<redacted>","status":"FINAL","mode":"replay","groups":[{"root":"a0","members":["a0","a1","a2"]},{"root":"a3","members":["a3"]}],"answers":{"fbe20fa9f1f15814205dbde2741397982b158580e43cd3bd4f022ce9fa6cebbf":{"answer":"no","reason":"The root alert is related to a TCP listener issue, while the downstream alert is related to a TLS handshake issue, indicating different underlying problems."}},"topology_hash":"0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332","input_hash":"86a910200b0ef300f20d20547313971540fe23f34382bf1658e6f21210ac1e8d"}
+SUBMIT CASE=A1 SC=1 STATUS=FINAL ALERTS_NEW=0 PRIOR_RESULT_PRESENT=1 RESULT_IDENTICAL_TO_PRIOR=1 RESULT_LEN=776
+PAYLOAD={"token":"<redacted>","status":"FINAL","mode":"replay","groups":[{"root":"a0","members":["a0","a1","a2"]}],"answers":{"2d20c3f66d4fb82dafa72f7719e96c6c33c2360f13a853761fabed9ecd3506bd":{"answer":"yes","reason":"The downstream failure of DB.Out.EHR caused messages to pile up in Router.ADT, resulting in a delayed ACK to HL7.In.ADT, which triggered the upstream alert."},"34c116108638048789d441a8f1f6c2d2538f935733032f4116b5d4505c74377d":{"answer":"yes","reason":"Both alerts report the same error code (#6022) and the same component (SQLServer.EHR) is failing, indicating a shared cause."}},"topology_hash":"0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332","input_hash":"e7698cd7c9bc357f9e2c16addaa32fd705c401f2af22b76cb25ddf39d04b2e39"}
+AFTER managed_alerts=7
+MA 1 | DB.Out.EHR | ERROR #6022: Gateway failed: SQLServer.EHR connection refused
+MA 2 | Router.ADT | Queue size 512 exceeds threshold
+MA 3 | HL7.In.ADT | ACK to sender delayed 45s: downstream queue full
+MA 4 | HL7.In.ADT | TCP listener on port 5000 stopped: address in use
+MA 5 | Router.ADT | Inactivity: no messages processed in 600s
+MA 6 | HL7.Out.LabA | Inactivity: no messages sent in 600s
+MA 7 | HL7.Out.RadB | TLS handshake failed: remote certificate expired 2026-11-01
+actions sql err  Field 'REASON' not found in the applicable tables^ SELECT ManagedAlert , ID , Reason FROM
+ACTION alert=1 #1 reason=Storm A1; root alert=1; related alert=2; mode=replay; topology=0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332
+ACTION alert=1 #2 reason=Storm A1; root alert=1; related alert=3; mode=replay; topology=0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332
+ACTION alert=1 #3 reason=Storm A1; question=2d20c3f66d4fb82dafa72f7719e96c6c33c2360f13a853761fabed9ecd3506bd; answer=yes; The downstream failure of DB.Out.EHR caused messages to pile up in Router.ADT, resulting in a delayed ACK to HL7.In.ADT, which triggered the upstream alert.
+ACTION alert=1 #4 reason=Storm A1; question=34c116108638048789d441a8f1f6c2d2538f935733032f4116b5d4505c74377d; answer=yes; Both alerts report the same error code (#6022) and the same component (SQLServer.EHR) is failing, indicating a shared cause.
+ACTION alert=4 #1 reason=Storm A2; root alert=4; related alert=5; mode=replay; topology=0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332
+ACTION alert=4 #2 reason=Storm A2; root alert=4; related alert=6; mode=replay; topology=0fe1393928567c522d3f079d870e8b1961e91089494875141f2db28760529332
+ACTION alert=4 #3 reason=Storm A2; question=fbe20fa9f1f15814205dbde2741397982b158580e43cd3bd4f022ce9fa6cebbf; answer=no; The root alert is related to a TCP listener issue, while the downstream alert is related to a TLS handshake issue, indicating different underlying problems.
+RECEIPT A1 status=FINAL alerts=a0->1 a1->2 a2->3 
+RECEIPT A2 status=FINAL alerts=a0->4 a1->5 a2->6 a3->7 
+SESSION storm=A1 session=2
+SESSION storm=A2 session=14
+SESSION storm=A2 session=22
+SESSION storm=A1 session=24
+
+# Second A2 resend, with the Managed Alert and action tables read over the IRIS REST API (/api/atelier/v1/USER/action/query) before and after:
+SUBMIT CASE=A2 (resend 2) SC=1 STATUS=FINAL ALERTS_NEW=0 RESULT_IDENTICAL_TO_PRIOR=1
+REST before: managed alerts=7, actions=7; REST after: managed alerts=7, actions=7 (rows identical)
+
+# Result: A2 settles into two groups, root a0 (TCP listener) with a1 and a2, and a3 (TLS certificate) on its own.
+# Managed Alert 4 (A2 root) carries the reasons for alerts 5 and 6 and the recorded answer "no"; alert 7 (TLS) stays separate.
+# Resending A2 and A1: ALERTS_NEW=0 each time and the saved result is identical. A1 stays one group under DB.Out.EHR.
