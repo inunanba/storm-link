@@ -208,6 +208,8 @@ Every bonus this entry claims, with the place to check it:
 | IRIS Vector Search | `Storm_Signature` table with `VECTOR(DOUBLE, 32)` and `VECTOR_COSINE` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
 | Custom Adapter | `Storm.WorkerAdapter` on `Storm.WorkerOp` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
 | Workflow Engine | `Storm.ReviewOperation` (extends `EnsLib.Workflow.Operation`) is the `Storm.Review` item in `Storm.DemoProduction`; it brings AI proposals selected by the grouping-rule checks to a teammate's Workflow inbox. Fresh IPM 1.0.4 install with reviewer task and Checked: [run](docs/ipm-1.0.4-fresh-install.txt); stop/restart-then-resend: [evidence](docs/workflow-idempotency.txt); `Storm.WorkflowTests` 9 methods, 64 assertions: [log](docs/workflow-test-run.txt) |
+| Find a bug in AI Hub | [#27 — IRISLOCALDATA mount after relocation](https://github.com/intersystems-community/ai-hub-eap-bugreports/issues/27) — submitted for review. |
+| Find a bug in Embedded Python | [#37 — session termination during alternating calls](https://github.com/intersystems-community/python-bugreports/issues/37); [#38 — row-fetch failure treated as end of results](https://github.com/intersystems-community/python-bugreports/issues/38) — submitted for review. |
 | Questionnaire | submitted |
 
 ## Troubleshooting
