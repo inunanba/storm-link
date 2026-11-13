@@ -16,7 +16,7 @@ Evidence at a glance: the [live-mode trace of storm A1](docs/trace-A1-C01-live.t
 
 Different causes stay separate, too: in an isolated Storm Link 1.0.4 run, the IRIS AI Hub agent used a recorded answer for storm A2, Storm Link grouped the TCP listener and TLS certificate alerts under separate causes, and resending the same storm ID added no alerts ([A2 replay evidence](docs/a2-1.0.4-isolated-run.txt)).
 
-**1. Watch the demo video:** https://youtu.be/N950ADnIfTc (MP4 download, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4))
+**1. Watch the demo video:** https://youtu.be/br2Apjz17WI (1:42). Earlier official cut: https://youtu.be/N950ADnIfTc (MP4 download, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4))
 
 **2. See the results.**
 
@@ -198,7 +198,7 @@ Every bonus this entry claims, with the place to check it:
 | Bonus | Evidence |
 |---|---|
 | Online demo | Running IRIS, read-only, replaying recorded AI answers: https://nemesis-evoke-guidance.ngrok-free.dev/ — click Visit Site on the ngrok notice, then sign in as `viewer` / `StormLink-Viewer-2026`. Landing page: Managed Alerts, Visual Trace of storm A1, and Message Viewer. IRIS AI Hub build 154, Production in replay mode, storms A1 and C01 preloaded. |
-| Video | YouTube: https://youtu.be/N950ADnIfTc · MP4, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4) ([release](https://github.com/inunanba/storm-link/releases/tag/media-v1)) |
+| Video | YouTube (1:42): https://youtu.be/br2Apjz17WI · earlier official cut: https://youtu.be/N950ADnIfTc · MP4, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4) ([release](https://github.com/inunanba/storm-link/releases/tag/media-v1)) |
 | Community Idea | [DPI-I-689](https://ideas.intersystems.com/ideas/DPI-I-689), also [DPI-I-627](https://ideas.intersystems.com/ideas/DPI-I-627); how they are implemented: [Community Idea implemented](#community-idea-implemented) |
 | Article (EN) | [English article on the InterSystems Developer Community](https://community.intersystems.com/post/storm-link-finding-one-cause-behind-alert-storm-inside-intersystems-iris) |
 | Article translation (JA) | [Japanese article on the Japanese Developer Community](https://jp.community.intersystems.com/node/590748) |
