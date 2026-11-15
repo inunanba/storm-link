@@ -16,6 +16,8 @@ Evidence at a glance: the [live-mode trace of storm A1](docs/trace-A1-C01-live.t
 
 Different causes stay separate, too: in an isolated Storm Link 1.0.4 run, the IRIS AI Hub agent used a recorded answer for storm A2, Storm Link grouped the TCP listener and TLS certificate alerts under separate causes, and resending the same storm ID added no alerts ([A2 replay evidence](docs/a2-1.0.4-isolated-run.txt)).
 
+**New in 1.0.5: optional Java PEX handoff.** A Java Business Operation built with InterSystems PEX can turn each saved root cause into a short on-call handoff card, in the same Visual Trace session. It is off by default; [Java PEX (optional)](#java-pex-optional) shows how to switch it on and what to look for. The online demo above runs 1.0.4 without Java PEX.
+
 **1. Watch the demo video:** https://youtu.be/br2Apjz17WI (1:42). Earlier official cut: https://youtu.be/N950ADnIfTc (MP4 download, no sign-in: [storm-link-demo.mp4](https://github.com/inunanba/storm-link/releases/download/media-v1/storm-link-demo.mp4))
 
 **2. See the results.**
@@ -158,13 +160,77 @@ All three A1 alerts landed under the root `DB.Out.EHR`, the whole storm took 14.
 
 ![Agent step in live mode: model, token usage, tool calls and duration](docs/img/agent-step-A1-live.png)
 
+## Java PEX (optional)
+
+Storm Link 1.0.5 adds an optional Java step built with InterSystems PEX (Production EXtension). After Storm Link saves a root cause, a Java Business Operation turns it into a short handoff card for the next on-call engineer, for example:
+
+```
+Storm A1
+Root Managed Alert #1; group Managed Alert IDs: 1,2,3
+```
+
+PEX lets plain Java code run as a regular Production item, so the Java step gets the same Visual Trace, Event Log and production settings as the rest of Storm Link.
+
+| Piece | What it is |
+|---|---|
+| `Storm.JavaHandoff` | Production item of class `EnsLib.PEX.BusinessOperation`, remote class `storm.pex.SafeHandoffOperation`, gateway `%Java Server` |
+| Java source | [SafeHandoffOperation.java](pex/java/storm/pex/SafeHandoffOperation.java) (extends `com.intersystems.enslib.pex.BusinessOperation`) and [HandoffCard.java](pex/java/storm/pex/HandoffCard.java); [build-jar.sh](pex/build-jar.sh) rebuilds the shipped [storm-safe-handoff.jar](pex/storm-safe-handoff.jar) with the same class files |
+| `Storm.PexDispatch` | sends each newly saved root cause to `Storm.JavaHandoff`, one at a time, and stores the card ([PexDispatch.cls](src/Storm/PexDispatch.cls), [PexSidecar.cls](src/Storm/PexSidecar.cls)) |
+| `Storm.Process` setting `EnablePexHandoff` | the switch; `0` by default |
+
+**What stays the same.** The FINAL result goes back to the caller before Java is called, and the card is stored separately. Root cause, grouping, Managed Alerts and Workflow are the same with Java PEX on or off: in fresh isolated runs, storms A1 and A2 gave the same results and the same Managed Alerts as 1.0.4, and the native test suites passed (12 methods / 72 assertions, Workflow 9 / 64) ([run summary](docs/java-pex-1.0.5-ipm-run.txt)).
+
+**Tested setup.** IRIS 2026.3 AI Hub Community build 154 with its bundled Java 11 (Temurin 11.0.32.1), Storm Link 1.0.5 loaded with IPM from a clone of this repository (`zpm "load /path/to/storm-link -v"`), worker in replay mode. IPM places the jar at `<mgr dir>/storm-link/pex/storm-safe-handoff.jar`; the PEX SDK jar comes with IRIS and is not shipped in this package.
+
+### Switch it on
+
+After the [Quick start](#quick-start) IPM steps (Production running, worker started), paste these lines into an IRIS terminal in the same namespace. They enable `Storm.JavaHandoff`, then `Storm.PexDispatch`, then set `EnablePexHandoff` to 1, applying the Production after each step; each step prints `1` twice.
+
+```
+Set p=##class(Ens.Config.Production).%OpenId("Storm.DemoProduction")
+For i=1:1:p.Items.Count() { Set it=p.Items.GetAt(i), item(it.Name)=it }
+Set jars=$System.Util.InstallDirectory()_"dev/java/lib/1.8/intersystems-pex-1.0.0-shaded.jar|"_$System.Util.ManagerDirectory()_"storm-link/pex/storm-safe-handoff.jar"
+For k="%remoteLanguage=JAVA","%gatewayExtraClasspaths="_jars { Set s=##class(Ens.Config.Setting).%New(), s.Target="Host", s.Name=$Piece(k,"=",1), s.Value=$Piece(k,"=",2,*) Do item("Storm.JavaHandoff").Settings.Insert(s) }
+Set item("Storm.JavaHandoff").Enabled=1 Write p.%Save(), ##class(Ens.Director).UpdateProduction(10,1),!
+Set item("Storm.PexDispatch").Enabled=1 Write p.%Save(), ##class(Ens.Director).UpdateProduction(10,1),!
+For j=1:1:item("Storm.Process").Settings.Count() { Set s=item("Storm.Process").Settings.GetAt(j) Set:s.Name="EnablePexHandoff" s.Value=1 }
+Write p.%Save(), ##class(Ens.Director).UpdateProduction(10,1),!
+```
+
+The same settings can be made in the Management Portal (Interoperability → Configure → Production): on `Storm.JavaHandoff` set `%remoteLanguage` to `JAVA` and `%gatewayExtraClasspaths` to the two jar paths above separated by `|`, then enable `Storm.JavaHandoff`, then `Storm.PexDispatch`, then tick `EnablePexHandoff` on `Storm.Process`.
+
+### See it work
+
+Submit storm A1 through the normal entry point, then read the card (use a storm ID that has not been submitted on this instance yet; a resent ID returns its saved receipt and does not call Java again):
+
+```
+Set f=##class(%Stream.FileCharacter).%New(), sc=f.LinkToFile($System.Util.ManagerDirectory()_"storm-link/fixtures/A1.json"), sc=##class(Storm.Service).Submit("A1",f.Read(32767),.out) Write out.Status,!
+Hang 2 Write ##class(Storm.PexSidecar).Status("A1"),!,##class(Storm.PexSidecar).Card("A1"),!
+```
+
+Expected on a fresh instance: `FINAL`, then `READY` and the card listing Managed Alert IDs 1, 2 and 3 — the same IDs you see on the Managed Alerts page. In Visual Trace, the storm's session shows `Storm.Process` → `Storm.PexDispatch` → `Storm.JavaHandoff` and the Java reply carrying the card, after the FINAL reply to `Storm.Service` ([trace export](docs/java-pex-1.0.5-ipm-run.txt)).
+
+### If Java was not available when the item started
+
+If `%Java Server` could not start (for example, Java was missing), the storm itself still finishes as FINAL and only the card is skipped. After Java is available again:
+
+1. Disable `Storm.JavaHandoff`, then enable it again, once.
+2. Wait until the earlier storm's handoff shows exactly `EXPIRED` with no card (`Write ##class(Storm.PexSidecar).Status("<storm id>")`; `EXPIRED_PENDING_DRAIN` means it is still being cleared).
+3. Then submit a new storm ID. Its handoff shows `READY` with a card.
+
+The earlier storm keeps its FINAL result and simply has no card. Storm Link does not retry Java calls on its own.
+
+### Switch it off again
+
+Set `EnablePexHandoff` on `Storm.Process` to 0 first. When no messages are waiting for `Storm.PexDispatch` or `Storm.JavaHandoff`, disable those two items. New storms then run exactly as in the default setup.
+
 ## Native tests
 
 ```sh
 docker compose exec -T iris iris session IRIS -U USER < scripts/runtests.script
 ```
 
-`Storm.Tests.RunTests()` runs every `%UnitTest` method in `Storm.NativeTests` and prints one line: **12 methods, 72 assertions, All PASSED** ([log](docs/native-test-run.txt)). The review-task suite `Storm.Tests.RunTests("Storm.WorkflowTests")`: **9 methods, 64 assertions, All PASSED** ([log](docs/workflow-test-run.txt)), plus a stop/restart check ([script](tests/crash_restart_check.sh), [run](docs/workflow-crash-restart-run.txt)). Python checks: `python3 tests/run_tests.py` (18 methods, 252 executed checks). All counts live in [test-metrics.json](docs/test-metrics.json), regenerated by the test runner.
+`Storm.Tests.RunTests()` runs every `%UnitTest` method in `Storm.NativeTests` and prints one line: **12 methods, 72 assertions, All PASSED** ([log](docs/native-test-run.txt)). The review-task suite `Storm.Tests.RunTests("Storm.WorkflowTests")`: **9 methods, 64 assertions, All PASSED** ([log](docs/workflow-test-run.txt)), plus a stop/restart check ([script](tests/crash_restart_check.sh), [run](docs/workflow-crash-restart-run.txt)). Python checks: `python3 tests/run_tests.py` (18 methods, 252 executed checks). All counts live in [test-metrics.json](docs/test-metrics.json), regenerated by the test runner. Run the Workflow suite once on a fresh instance: it expects first-run state, and a second run in the same instance reports the same 6 failing checks in 1.0.4 and 1.0.5.
 
 ## Benchmark
 
@@ -203,10 +269,11 @@ Every bonus this entry claims, with the place to check it:
 | Article (EN) | [English article on the InterSystems Developer Community](https://community.intersystems.com/post/storm-link-finding-one-cause-behind-alert-storm-inside-intersystems-iris) |
 | Article translation (JA) | [Japanese article on the Japanese Developer Community](https://jp.community.intersystems.com/node/590748) |
 | Docker | `docker compose up -d --build` — see [Quick start](#quick-start) |
-| IPM | package `storm-link` 1.0.4, `zpm "install storm-link"`; `module.xml` at the repo root |
+| IPM | package `storm-link` 1.0.5 (`module.xml` at the repo root): `zpm "install storm-link"` from the public registry, or `zpm "load /path/to/storm-link"` from a clone |
 | Embedded Python | `Storm.Signature.Embed` and `Storm.Signature.FindSimilar` (`Language = python`) — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
 | IRIS Vector Search | `Storm_Signature` table with `VECTOR(DOUBLE, 32)` and `VECTOR_COSINE` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
 | Custom Adapter | `Storm.WorkerAdapter` on `Storm.WorkerOp` — see [Technology bonuses](#technology-bonuses-used-in-this-entry) |
+| Java PEX | `Storm.JavaHandoff` (`EnsLib.PEX.BusinessOperation`) runs the Java class `storm.pex.SafeHandoffOperation` ([source](pex/java/storm/pex/SafeHandoffOperation.java)) through the `%Java Server` gateway; `Storm.PexDispatch` sends it each newly saved root cause. Off by default; steps, Visual Trace and evidence: [Java PEX (optional)](#java-pex-optional) |
 | Workflow Engine | `Storm.ReviewOperation` (extends `EnsLib.Workflow.Operation`) is the `Storm.Review` item in `Storm.DemoProduction`; it brings AI proposals selected by the grouping-rule checks to a teammate's Workflow inbox. Fresh IPM 1.0.4 install with reviewer task and Checked: [run](docs/ipm-1.0.4-fresh-install.txt); stop/restart-then-resend: [evidence](docs/workflow-idempotency.txt); `Storm.WorkflowTests` 9 methods, 64 assertions: [log](docs/workflow-test-run.txt) |
 | Find a bug in AI Hub | [#27 — IRISLOCALDATA mount after relocation](https://github.com/intersystems-community/ai-hub-eap-bugreports/issues/27) — submitted for review. |
 | Find a bug in Embedded Python | [#37 — session termination during alternating calls](https://github.com/intersystems-community/python-bugreports/issues/37); [#38 — row-fetch failure treated as end of results](https://github.com/intersystems-community/python-bugreports/issues/38) — submitted for review. |

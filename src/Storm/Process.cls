@@ -1,6 +1,9 @@
 Include %occStatus
 Class Storm.Process Extends Ens.BusinessProcess
 {
+Parameter SETTINGS = "EnablePexHandoff";
+Property EnablePexHandoff As %Boolean [ InitialExpression = 0 ];
+
 Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As %Status
 {
   Set pResponse=##class(Storm.Reply).%New(),pResponse.Status="UNKNOWN",tx=0
@@ -112,6 +115,11 @@ Method OnRequest(pRequest As Storm.Message, Output pResponse As Storm.Reply) As 
     Set pResponse.Status="UNKNOWN",pResponse.Payload="original storm requires reconciliation; no automatic retry"
   }
   Lock -^Storm.Receipt(rid)
+  // First successful commit only; no requeue on redelivery or invalid input.
+  // Execute after the existing lock is released and outside the core failure handler.
+  If (pResponse.Status="FINAL"),($Data(state)>0),(..EnablePexHandoff=1) {
+    Try { Do ##class(Storm.PexSidecar).Submit($THIS,rid,state) } Catch {}
+  }
   Quit $$$OK
 }
 /// One native Workflow task (EnsLib.Workflow.Operation "Storm.Review"); fire-and-forget, no response is awaited,

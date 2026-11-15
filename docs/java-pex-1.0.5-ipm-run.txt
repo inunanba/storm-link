@@ -1,0 +1,183 @@
+# Storm Link 1.0.5: optional Java PEX handoff, fresh isolated IPM install runs
+# Environment: IRIS 2026.3 AI Hub Community build 154 (2026.3.0AI.154.0com), bundled Java 11 (Temurin 11.0.32.1), IPM zpm 0.10.10.
+# Each run used a new container with no network, no published ports and no mounts; containers were deleted afterwards.
+# Install: zpm "load /pkg/storm-link -v" from this repository's files (module.xml sha256 030b961ef8046b3f13e3c9560f3f1f8b46d9c3396d80e48966ea99ac050daa55).
+# App jar pex/storm-safe-handoff.jar sha256 74a7374f5c58a225afb093e81d4a567dc0137825f54b45b7d22355997628ee62;
+#   rebuilt from pex/java with pex/build-jar.sh on the same image: HandoffCard.class f396ecea...a9e344 and SafeHandoffOperation.class da2af3ce...3e063, identical to the shipped jar.
+# Worker in replay mode (recorded AI answers). IRIS log times are UTC (JST = UTC+9).
+# Run dates: 2026-11-13 21:00-21:10 JST (comparison with 1.0.4) and 2026-11-15 17:11-17:13 JST (README steps on the final tree).
+
+== 1. Same results with Java PEX off (default) and on, compared with 1.0.4 ==
+state                  | A1 result sha256 (token removed) | A2 result sha256 (token removed) | Managed Alerts | native | Workflow
+1.0.4 (baseline)       | 9e8a1ab8...                      | 5323f5ee...                      | 7, fingerprint 3817fa8d... | 12/72 PASS | 9/64 PASS
+1.0.5 default (off)    | 9e8a1ab8...                      | 5323f5ee...                      | 7, fingerprint 3817fa8d... | 12/72 PASS | 9/64 PASS
+1.0.5 Java PEX on      | 9e8a1ab8...                      | 5323f5ee...                      | 7, fingerprint 3817fa8d... | 12/72 PASS | 9/64 PASS
+
+-- default configuration after install (1.0.5)
+CONFIG item=Storm.Service class=Storm.Service enabled=1
+CONFIG item=Storm.Process class=Storm.Process enabled=1 Host:EnablePexHandoff=0
+CONFIG item=Storm.WorkerOp class=Storm.WorkerOperation enabled=1 Adapter:HTTPServer=127.0.0.1 Adapter:HTTPPort=8088
+CONFIG item=Storm.Agent class=Storm.AgentOperation enabled=1
+CONFIG item=Storm.Review class=Storm.ReviewOperation enabled=1 Host:AutoCreateRole=0
+CONFIG item=Storm.PexDispatch class=Storm.PexDispatch enabled=0
+CONFIG item=Storm.JavaHandoff class=EnsLib.PEX.BusinessOperation enabled=0 Host:%remoteClassname=storm.pex.SafeHandoffOperation Host:%gatewayName=%Java Server
+OUT|sidecar A1=NOT_GENERATED A2=NOT_GENERATED JavaHandoff msgs=0 PexDispatch msgs=0
+java procs=0
+
+-- after the enable steps (JavaHandoff, then PexDispatch, then EnablePexHandoff=1)
+CONFIG item=Storm.Service class=Storm.Service enabled=1
+CONFIG item=Storm.Process class=Storm.Process enabled=1 Host:EnablePexHandoff=1
+CONFIG item=Storm.WorkerOp class=Storm.WorkerOperation enabled=1 Adapter:HTTPServer=127.0.0.1 Adapter:HTTPPort=8088
+CONFIG item=Storm.Agent class=Storm.AgentOperation enabled=1
+CONFIG item=Storm.Review class=Storm.ReviewOperation enabled=1 Host:AutoCreateRole=0
+CONFIG item=Storm.PexDispatch class=Storm.PexDispatch enabled=1
+CONFIG item=Storm.JavaHandoff class=EnsLib.PEX.BusinessOperation enabled=1 Host:%remoteClassname=storm.pex.SafeHandoffOperation Host:%gatewayName=%Java Server Host:%remoteLanguage=JAVA Host:%gatewayExtraClasspaths=/usr/irissys/dev/java/lib/1.8/intersystems-pex-1.0.0-shaded.jar|/usr/irissys/mgr/storm-link/pex/storm-safe-handoff.jar
+A1 id=A1 sc=1 status=FINAL submitMs=312.9 result_sha256_excl_token=9e8a1ab8b0dbbc1351750ce2032a104b8d1ca875a401f21c6b83043a63644260 pexStatusAtReturn=IN_FLIGHT
+A1 wait status=READY raw=READY waitedSec=0.90 slot=<free>
+A1 expected MA refs=1:1,2,3
+A1 card=Storm A1|Root Managed Alert #1; group Managed Alert IDs: 1,2,3
+A2 id=A2 sc=1 status=FINAL submitMs=37.8 result_sha256_excl_token=5323f5ee9050fe362c871aee9c001ee583c5731848713099c48acdebe535b048 pexStatusAtReturn=IN_FLIGHT
+A2 wait status=READY raw=READY waitedSec=0.10 slot=<free>
+A2 expected MA refs=4:4,5,6;7:7
+A2 card=Storm A2|Root Managed Alert #4; group Managed Alert IDs: 4,5,6|Root Managed Alert #7; group Managed Alert IDs: 7
+java calls=2 dispatch=2
+core managedAlerts=7 alertActions=7 coreSha=3817fa8dfd4301abcf6cf7b062bb5beed0f3d769affb1e310391cfde8db9a857
+
+== 2. Visual Trace of storm A1 with Java PEX on (session 4) ==
+TRACE session=4 msg=4 Request Storm.Service -> Storm.Process status=Completed error=0 created=2026-11-13 12:03:02.929 processed=2026-11-13 12:03:03.24 body=Storm.Message#1
+  body StormId=A1
+TRACE session=4 msg=5 Request Storm.Process -> Storm.WorkerOp status=Completed error=0 created=2026-11-13 12:03:02.931 processed=2026-11-13 12:03:02.933 body=Storm.WorkerRequest#2
+TRACE session=4 msg=6 Response Storm.WorkerOp -> Storm.Process status=Completed error=0 created=2026-11-13 12:03:02.933 processed=2026-11-13 12:03:02.933 body=Storm.WorkerReply#3
+TRACE session=4 msg=7 Request Storm.Process -> Storm.Agent status=Completed error=0 created=2026-11-13 12:03:02.933 processed=2026-11-13 12:03:02.953 body=Storm.Message#4
+  body StormId=A1
+TRACE session=4 msg=8 Response Storm.Agent -> Storm.Process status=Completed error=0 created=2026-11-13 12:03:02.954 processed=2026-11-13 12:03:02.954 body=Storm.Reply#5
+  body Status=ANSWER
+TRACE session=4 msg=9 Request Storm.Process -> Storm.WorkerOp status=Completed error=0 created=2026-11-13 12:03:02.954 processed=2026-11-13 12:03:02.955 body=Storm.WorkerRequest#6
+TRACE session=4 msg=10 Response Storm.WorkerOp -> Storm.Process status=Completed error=0 created=2026-11-13 12:03:02.955 processed=2026-11-13 12:03:02.955 body=Storm.WorkerReply#7
+TRACE session=4 msg=11 Request Storm.Process -> Storm.Agent status=Completed error=0 created=2026-11-13 12:03:02.956 processed=2026-11-13 12:03:02.961 body=Storm.Message#8
+  body StormId=A1
+TRACE session=4 msg=12 Response Storm.Agent -> Storm.Process status=Completed error=0 created=2026-11-13 12:03:02.961 processed=2026-11-13 12:03:02.961 body=Storm.Reply#9
+  body Status=ANSWER
+TRACE session=4 msg=13 Request Storm.Process -> Storm.WorkerOp status=Completed error=0 created=2026-11-13 12:03:02.961 processed=2026-11-13 12:03:02.962 body=Storm.WorkerRequest#10
+TRACE session=4 msg=14 Response Storm.WorkerOp -> Storm.Process status=Completed error=0 created=2026-11-13 12:03:02.962 processed=2026-11-13 12:03:02.963 body=Storm.WorkerReply#11
+TRACE session=4 msg=15 Request Storm.Process -> Storm.PexDispatch status=Completed error=0 created=2026-11-13 12:03:03.239 processed=2026-11-13 12:03:04.136 body=Storm.PexRequest#12
+  body StormId=A1 Groups=1:1,2,3
+TRACE session=4 msg=16 Response Storm.Process -> Storm.Service status=Completed error=0 created=2026-11-13 12:03:03.24 processed=2026-11-13 12:03:03.24 body=Storm.Reply#13
+  body Status=FINAL
+TRACE session=4 msg=17 Request Storm.PexDispatch -> Storm.JavaHandoff status=Completed error=0 created=2026-11-13 12:03:03.24 processed=2026-11-13 12:03:04.083 body=Storm.PexRequest#12
+  body StormId=A1 Groups=1:1,2,3
+TRACE session=4 msg=18 Response Storm.JavaHandoff -> Storm.PexDispatch status=Completed error=0 created=2026-11-13 12:03:04.083 processed=2026-11-13 12:03:04.136 body=Storm.PexReply#14
+  body Card=Storm A1|Root Managed Alert #1; group Managed Alert IDs: 1,2,3
+
+== 3. Java not available when Storm.JavaHandoff started, then the README recovery ==
+== step1 21:03:38.859 JST: disable JavaHandoff, stop %Java Server gateway
+disable JavaHandoff sc=
+StopGateway sc=1
+java procs after gateway stop=2
+java binary chmod a-x at 21:03:41.116 JST (Java unavailable before the handoff operation starts)
+enable JavaHandoff (Java unavailable) sc=
+R1 id=R1 sc=1 status=FINAL submitMs=47.5 result_sha256_excl_token=dcfb80465f759514d81e1659b0bb4c83d1a6f9b797ee940b09b2f9a4c09ecbcb pexStatusAtReturn=IN_FLIGHT
+R1 status=EXPIRED_PENDING_DRAIN raw=IN_FLIGHT waitedSec=5.01 slot=R1
+R2 id=R2 sc=1 status=FINAL submitMs=43.3 result_sha256_excl_token=9620448e0d10eb810dec5297b7205c725c1603dc5377abc09b07aa783cc05929 pexStatusAtReturn=NOT_GENERATED
+R2 pex=NOT_GENERATED
+java procs at 21:04:00 JST: 0
+== +70s 21:05:10.906 JST
+R1 status=EXPIRED_PENDING_DRAIN raw=IN_FLIGHT waitedSec=0.00 slot=R1 queue JavaHandoff=31
+java binary restored at 21:05:11.049 JST (no admin step yet)
++15s no admin step: R1 status=EXPIRED_PENDING_DRAIN raw=IN_FLIGHT waitedSec=0.00 slot=R1
+== README recovery at 21:05:26.129 JST: restart JavaHandoff once (disable, then enable)
+disable JavaHandoff sc=1
+enable JavaHandoff sc=1
+old R1 after item restart status=EXPIRED_PENDING_DRAIN raw=IN_FLIGHT waitedSec=0.00 slot=R1 storedCard=[]
+R3 (new input) id=R3 sc=1 status=FINAL submitMs=66.6 result_sha256_excl_token=0b4ecff872a8331c4b39b9b43663f3b0c57fdfdd38aaf77998e2e7b51d669398 pexStatusAtReturn=NOT_GENERATED
+R3 status=NOT_GENERATED raw=<none> waitedSec=0.00 slot=R1 card= expect=104:104,105,106
+R3 sessions=
+R1 status=EXPIRED raw=EXPIRED waitedSec=0.00 slot=<free> storedCard=[]
+R3 status=NOT_GENERATED raw=<none> waitedSec=0.00 slot=<free>
+== README order: old R1 already EXPIRED without card (above); new input at 21:05:44.515 JST
+R4 (new input) id=R4 sc=1 status=FINAL submitMs=58.5 result_sha256_excl_token=e1df5ecb963e6aa540b1bef52910769cd6d00986ea224cd9144ffaa3f6f2ea61 pexStatusAtReturn=IN_FLIGHT
+R4 status=READY raw=READY waitedSec=0.10 slot=<free> card=Storm R4|Root Managed Alert #107; group Managed Alert IDs: 107,108,109 expect=107:107,108,109
+R4 sessions=396
+
+== 4. Switching it off again ==
+== disable back 21:05:56.827 JST: EnablePexHandoff=0 first
+EnablePexHandoff=0 sc=1
+drain check slot=<free>
+pending to PexDispatch/JavaHandoff=0
+disable PexDispatch sc=1
+disable JavaHandoff sc=1
+CONFIG item=Storm.Service class=Storm.Service enabled=1
+CONFIG item=Storm.Process class=Storm.Process enabled=1 Host:EnablePexHandoff=0
+CONFIG item=Storm.WorkerOp class=Storm.WorkerOperation enabled=1 Adapter:HTTPServer=127.0.0.1 Adapter:HTTPPort=8088
+CONFIG item=Storm.Agent class=Storm.AgentOperation enabled=1
+CONFIG item=Storm.Review class=Storm.ReviewOperation enabled=1 Host:AutoCreateRole=0
+CONFIG item=Storm.PexDispatch class=Storm.PexDispatch enabled=0
+CONFIG item=Storm.JavaHandoff class=EnsLib.PEX.BusinessOperation enabled=0 Host:%remoteClassname=storm.pex.SafeHandoffOperation Host:%gatewayName=%Java Server Host:%remoteLanguage=JAVA Host:%gatewayExtraClasspaths=/usr/irissys/dev/java/lib/1.8/intersystems-pex-1.0.0-shaded.jar|/usr/irissys/mgr/storm-link/pex/storm-safe-handoff.jar
+R5 (normal path after disable) id=R5 sc=1 status=FINAL submitMs=100.6 result_sha256_excl_token=ff3dc7e836da2154123f2d3e35e73520053cf202b105f32af3afefb97c712796 pexStatusAtReturn=NOT_GENERATED
+R5 pex=NOT_GENERATED newDispatchMsgs=0 expect=110:110,111,112;113:113
+disabled-again workflow: FAILED: methods=9 assertions_passed=58 assertions_failed=6
+disabled-again native:   All PASSED: methods=12 assertions_passed=72 assertions_failed=0
+w324-en deleted 21:06:24 JST
+
+== 5. README steps on the final 1.0.5 tree (2026-11-15) ==
+=== Fresh IPM load of this repository, then the README 'Switch it on' and 'See it work' lines
+box=sl105-ipm network=none ports={} mounts=0
+module.xml: 030b961ef8046b3f13e3c9560f3f1f8b46d9c3396d80e48966ea99ac050daa55  /pkg/storm-link/module.xml
+OUT|zpm=
+[USER|storm-link]	Initialize SUCCESS
+[USER|storm-link]	Reload SUCCESS
+[USER|storm-link]	Validate SUCCESS
+[USER|storm-link]	Compile SUCCESS
+[USER|storm-link]	Configure SUCCESS
+[USER|storm-link]	Activate SUCCESS
+storm-link 1.0.5
+74a7374f5c58a225afb093e81d4a567dc0137825f54b45b7d22355997628ee62  /usr/irissys/mgr/storm-link/pex/storm-safe-handoff.jar
+OUT|Setup=1
+OUT|Start=
+WORKER_UP
+--- default (disabled) config
+OUT|Storm.Service enabled=1
+OUT|Storm.Process enabled=1
+OUT|Storm.WorkerOp enabled=1
+OUT|Storm.Agent enabled=1
+OUT|Storm.Review enabled=1
+OUT|Storm.PexDispatch enabled=0
+OUT|Storm.JavaHandoff enabled=0
+--- README enable block
+1
+08:12:06.384:Ens.Director: Production 'Storm.DemoProduction' updating... (UpdateTimeout: 10s, Force flag: 1)
+08:12:06.392:Ens.Director: Production 'Storm.DemoProduction' updated.1
+1
+08:12:06.396:Ens.Director: Production 'Storm.DemoProduction' updating... (UpdateTimeout: 10s, Force flag: 1)
+08:12:06.406:Ens.Director: Production 'Storm.DemoProduction' updated.1
+1
+08:12:06.409:Ens.Director: Production 'Storm.DemoProduction' updating... (UpdateTimeout: 10s, Force flag: 1)
+08:12:06.414:Ens.Director: ConfigItem 'Storm.Process' (Ens.Actor) stopped in job 1020
+08:12:06.418:Ens.Director: Production 'Storm.DemoProduction' updated.1
+--- README try block (A1)
+READY
+Storm A1
+Root Managed Alert #1; group Managed Alert IDs: 1,2,3
+OUT|A2 FINAL
+OUT|A2 pex=READY card=Storm A2
+All PASSED
+All PASSED: methods=12 assertions_passed=72 assertions_failed=0
+All PASSED
+All PASSED: methods=9 assertions_passed=64 assertions_failed=0
+sl105-ipm deleted 17:12:22 JST
+=== Same steps as Dockerfile + init.script (src/ copied to /opt/storm, init.script run), started with docker run; default disabled
+box=sl105-src network=none ports={} mounts=0
+STORM_PRODUCTION_STATE_BEFORE_START=2
+STORM_SOURCE_LOADED_NATIVE_SMOKE_REQUIRED
+WORKER_UP
+CASE=C01 SC=1 STATUS=FINAL ALERTS_NEW=3
+CASE=A1 SC=1 STATUS=FINAL ALERTS_NEW=3
+A1_SESSION=6
+All PASSED
+All PASSED: methods=12 assertions_passed=72 assertions_failed=0
+All PASSED
+All PASSED: methods=9 assertions_passed=64 assertions_failed=0
+OUT|A1 pex=NOT_GENERATED
+sl105-src deleted 17:12:41 JST
+
+Note: Storm.WorkflowTests expects a fresh instance. A second run in the same instance reports the same 6 failing checks in 1.0.4 and in 1.0.5 (default), so run it once per fresh instance.

@@ -1,20 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <Export generator="Cache" version="25">
   <Document name="storm-link.ZPM">
     <Module>
       <Name>storm-link</Name>
-      <Version>1.0.4</Version>
+      <Version>1.0.5</Version>
       <Description>Folds an alert storm in an IRIS Production into one root cause on a Managed Alert, using the topology graph plus a %AI.Agent yes/no check.</Description>
       <Keywords>AI Hub,Interoperability,Alerting,Agent</Keywords>
       <Packaging>module</Packaging>
-      <SystemRequirements Version=">=2026.3" Interoperability="enabled"/>
+      <SystemRequirements Version="&gt;=2026.3" Interoperability="enabled" />
       <SourcesRoot>src</SourcesRoot>
-      <Resource Name="Storm.PKG"/>
-      <FileCopy Name="worker.py" Target="${mgrdir}storm-link/worker.py"/>
-      <FileCopy Name="fixtures/" Target="${mgrdir}storm-link/fixtures/"/>
-      <FileCopy Name="bench/" Target="${mgrdir}storm-link/bench/"/>
-      <FileCopy Name="recordings/ai_v2_dev.json" Target="${mgrdir}storm-link/recordings/ai_v2_dev.json"/>
-      <FileCopy Name="recordings/ai_v2_heldout.json" Target="${mgrdir}storm-link/recordings/ai_v2_heldout.json"/>
-    </Module>
+      <Resource Name="Storm.PKG" />
+      <FileCopy Name="worker.py" Target="${mgrdir}storm-link/worker.py" />
+      <FileCopy Name="fixtures/" Target="${mgrdir}storm-link/fixtures/" />
+      <FileCopy Name="bench/" Target="${mgrdir}storm-link/bench/" />
+      <FileCopy Name="recordings/ai_v2_dev.json" Target="${mgrdir}storm-link/recordings/ai_v2_dev.json" />
+      <FileCopy Name="recordings/ai_v2_heldout.json" Target="${mgrdir}storm-link/recordings/ai_v2_heldout.json" />
+    <FileCopy Name="pex/storm-safe-handoff.jar" Target="${mgrdir}storm-link/pex/storm-safe-handoff.jar" /></Module>
   </Document>
 </Export>

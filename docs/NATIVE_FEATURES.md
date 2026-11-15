@@ -14,6 +14,7 @@ Every feature below is exercised by `scripts/demo.sh` on IRIS 2026.3.0AI.154 (Co
 | Custom outbound adapter (`Ens.OutboundAdapter`) | `Storm.WorkerAdapter`, used by `Storm.WorkerOperation` in `Storm.DemoProduction` | Isolates the private worker HTTP contract behind a Production adapter; Business Process calls WorkerOp, not raw `%Net.HttpRequest`. |
 | Embedded Python (`Language = python`) | `Storm.Signature.Embed`, `Storm.Signature.FindSimilar` (`import iris`) | Builds the storm signature next to the data; FindSimilar drives VECTOR SQL through the IRIS Python module. |
 | IRIS Vector Search (`VECTOR`, `TO_VECTOR`, `VECTOR_COSINE`) | Table `Storm_Signature`, written from `Storm.Process` after FINAL | Stores each settled storm and retrieves the nearest past storm for the root Managed Alert reason. |
+| Java PEX (`EnsLib.PEX.BusinessOperation`, `%Java Server`), optional, off by default | `Storm.JavaHandoff` running `storm.pex.SafeHandoffOperation` ([source](../pex/java/storm/pex/SafeHandoffOperation.java)), fed by `Storm.PexDispatch` | A Java class runs as a regular Production item, so the on-call handoff card it formats appears in the storm's own Visual Trace session and uses production settings. The FINAL result is returned before Java is called and is the same with the step on or off ([README steps](../README.md#java-pex-optional), [run](java-pex-1.0.5-ipm-run.txt)). |
 
 ## Evidence (compose smoke run)
 
